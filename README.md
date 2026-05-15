@@ -566,8 +566,8 @@ MIT License - See LICENSE file for details
 ## 📞 Contact
 
 **Project Repository:** https://github.com/NboTop/testforge-pro
-**Live Demo:** Coming soon
-**Demo Video:** Coming soon
+**Documentation:** See project files for comprehensive guides
+**IBM Bob Sessions:** Available in `bob_sessions/` directory
 
 ---
 

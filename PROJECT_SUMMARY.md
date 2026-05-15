@@ -67,7 +67,7 @@ TestForge Pro is an AI-powered test generation platform that demonstrates automa
 
 ---
 
-## 🧪 Testing Results
+## 🧪 Manual Demo Verification
 
 ### API Endpoint Tests (All Passing ✅)
 
@@ -75,7 +75,7 @@ TestForge Pro is an AI-powered test generation platform that demonstrates automa
 ```bash
 ✅ POST request successful
 ✅ Returns 3 functions (2 untested, 1 tested)
-✅ Response time: ~800ms (simulated)
+✅ Response time: simulated delay for realistic UX
 ✅ Proper JSON structure
 ```
 
@@ -84,7 +84,7 @@ TestForge Pro is an AI-powered test generation platform that demonstrates automa
 ✅ POST request successful
 ✅ Generates comprehensive Jest tests
 ✅ Includes edge cases and error handling
-✅ Response time: ~1000ms (simulated)
+✅ Response time: simulated delay for realistic UX
 ✅ Valid TypeScript/Jest syntax
 ```
 
@@ -93,7 +93,7 @@ TestForge Pro is an AI-powered test generation platform that demonstrates automa
 ✅ POST request successful
 ✅ Returns mock PR URL
 ✅ Success message displayed
-✅ Response time: ~500ms (simulated)
+✅ Response time: simulated delay for realistic UX
 ```
 
 ### User Flow Testing
@@ -117,7 +117,7 @@ testforge-pro/
 │   │   ├── analyze/route.ts          # Repository analysis endpoint
 │   │   ├── generate-test/route.ts    # Test generation endpoint
 │   │   └── create-pr/route.ts        # PR creation endpoint
-│   ├── page.tsx                      # Main dashboard (352 lines)
+│   ├── page.tsx                      # Main dashboard
 │   ├── layout.tsx                    # Root layout
 │   └── globals.css                   # Global styles
 ├── bob_sessions/

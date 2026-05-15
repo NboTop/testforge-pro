@@ -181,70 +181,7 @@ docker run -p 3000:3000 --env-file .env.local testforge-pro
 
 ---
 
-## ☁️ AWS Deployment
-
-### Deploy to AWS Amplify
-
-1. Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify/)
-2. Click "New app" → "Host web app"
-3. Connect your GitHub repository
-4. Configure build settings:
-   ```yaml
-   version: 1
-   frontend:
-     phases:
-       preBuild:
-         commands:
-           - cd testforge-pro
-           - npm ci
-       build:
-         commands:
-           - npm run build
-     artifacts:
-       baseDirectory: testforge-pro/.next
-       files:
-         - '**/*'
-     cache:
-       paths:
-         - node_modules/**/*
-   ```
-5. Add environment variables in Amplify console
-6. Deploy
-
-### Deploy to AWS EC2
-
-```bash
-# SSH into EC2 instance
-ssh -i your-key.pem ec2-user@your-instance-ip
-
-# Install Node.js
-curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-sudo yum install -y nodejs
-
-# Clone repository
-git clone https://github.com/your-username/testforge-pro.git
-cd testforge-pro
-
-# Install dependencies
-npm install
-
-# Build application
-npm run build
-
-# Install PM2 for process management
-sudo npm install -g pm2
-
-# Start application
-pm2 start npm --name "testforge-pro" -- start
-
-# Save PM2 configuration
-pm2 save
-pm2 startup
-```
-
----
-
-## 🌐 Custom Domain Setup
+## 🌐 Custom Domain Setup (Optional)
 
 ### Vercel
 
@@ -252,19 +189,6 @@ pm2 startup
 2. Add your custom domain
 3. Configure DNS records as instructed
 4. Wait for SSL certificate provisioning
-
-### Cloudflare + Vercel
-
-1. Add site to Cloudflare
-2. Update nameservers at domain registrar
-3. In Vercel, add custom domain
-4. In Cloudflare DNS, add CNAME:
-   ```
-   Type: CNAME
-   Name: @
-   Target: cname.vercel-dns.com
-   Proxy: Enabled
-   ```
 
 ---
 
@@ -318,56 +242,6 @@ npm install @sentry/nextjs
 npx @sentry/wizard@latest -i nextjs
 
 # Configure in sentry.client.config.ts and sentry.server.config.ts
-```
-
----
-
-## 🔄 CI/CD Pipeline
-
-### GitHub Actions
-
-**File:** `.github/workflows/deploy.yml`
-
-```yaml
-name: Deploy to Production
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          
-      - name: Install dependencies
-        run: |
-          cd testforge-pro
-          npm ci
-          
-      - name: Run tests
-        run: |
-          cd testforge-pro
-          npm test
-          
-      - name: Build
-        run: |
-          cd testforge-pro
-          npm run build
-          
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./testforge-pro
 ```
 
 ---
@@ -486,7 +360,7 @@ Before going live:
 For deployment issues:
 - Vercel: [vercel.com/support](https://vercel.com/support)
 - Next.js: [nextjs.org/docs](https://nextjs.org/docs)
-- GitHub: [github.com/your-username/testforge-pro/issues](https://github.com)
+- Project Documentation: See README.md and other guides in the repository
 
 ---
 

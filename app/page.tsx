@@ -145,8 +145,13 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-              Built with IBM Bob + watsonx.ai
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+                Built with IBM Bob + watsonx.ai
+              </div>
+              <div className="rounded-2xl border border-blue-400/30 bg-blue-500/10 px-4 py-3 text-xs text-blue-200">
+                Demo Mode · Mock Fallback Active (watsonx.ai-ready)
+              </div>
             </div>
           </div>
         </div>
@@ -298,13 +303,16 @@ export default function Home() {
 
               {prUrl && (
                 <div className="mt-4 rounded-xl border border-green-400/20 bg-green-500/10 p-4 text-sm text-green-100">
-                  Pull request workflow ready:{" "}
+                  <strong>✓ Demo PR Workflow Complete</strong>
+                  <p className="mt-2 text-xs text-green-100/80">
+                    This simulates the pull request creation process. In production, this would create a branch, commit the generated test file, and open an actual GitHub pull request.
+                  </p>
                   <a
                     href={prUrl}
                     target="_blank"
-                    className="underline underline-offset-4"
+                    className="mt-2 inline-block underline underline-offset-4"
                   >
-                    View PR
+                    View simulated PR URL →
                   </a>
                 </div>
               )}
@@ -312,13 +320,31 @@ export default function Home() {
 
             <div className="rounded-2xl border border-blue-400/20 bg-blue-500/10 p-5">
               <h2 className="text-lg font-medium text-blue-100">
-                IBM Bob usage proof
+                🤖 IBM Bob Development Partnership
               </h2>
               <p className="mt-2 text-sm leading-6 text-blue-100/80">
-                IBM Bob is used as the development partner for planning,
-                implementation, debugging, UI generation, and code review. The
-                exported task reports are included in the{" "}
-                <span className="font-mono">bob_sessions/</span> folder.
+                This project was built in collaboration with <strong>IBM Bob</strong> as the primary development assistant throughout the entire lifecycle.
+              </p>
+              <div className="mt-4 space-y-2 text-sm text-blue-100/80">
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-300">✓</span>
+                  <span><strong>Architecture Planning:</strong> System design and technology decisions</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-300">✓</span>
+                  <span><strong>API Implementation:</strong> All three API routes developed with Bob</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-300">✓</span>
+                  <span><strong>Code Review:</strong> Quality improvements and best practices</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-300">✓</span>
+                  <span><strong>Documentation:</strong> Comprehensive guides and session logs</span>
+                </div>
+              </div>
+              <p className="mt-4 text-xs text-blue-100/60">
+                📁 Complete session documentation available in <span className="font-mono bg-blue-500/20 px-1.5 py-0.5 rounded">bob_sessions/</span> directory
               </p>
             </div>
           </div>
