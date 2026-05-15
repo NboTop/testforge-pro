@@ -10,46 +10,6 @@ type FunctionItem = {
   reason: string;
 };
 
-const mockFunctions: FunctionItem[] = [
-  {
-    name: "calculateFinalPrice",
-    file: "src/paymentService.ts",
-    tested: false,
-    severity: "High",
-    reason: "Payment calculation has no matching test coverage.",
-  },
-  {
-    name: "applyDiscountCode",
-    file: "src/discountCalculator.ts",
-    tested: false,
-    severity: "Medium",
-    reason: "Discount logic has no edge-case tests.",
-  },
-  {
-    name: "validateUserEmail",
-    file: "src/userValidator.ts",
-    tested: true,
-    severity: "Low",
-    reason: "Matching test file found.",
-  },
-];
-
-const generatedTest = `import { calculateFinalPrice } from "../src/paymentService";
-
-describe("calculateFinalPrice", () => {
-  it("calculates final price with tax and discount", () => {
-    expect(calculateFinalPrice(100, 0.1, 10)).toBe(100);
-  });
-
-  it("throws an error for negative base price", () => {
-    expect(() => calculateFinalPrice(-100, 0.1, 10)).toThrow("Base price cannot be negative");
-  });
-
-  it("handles zero discount", () => {
-    expect(calculateFinalPrice(100, 0.1, 0)).toBe(110);
-  });
-});`;
-
 export default function Home() {
   const [repoUrl, setRepoUrl] = useState(
     "https://github.com/your-username/testforge-demo-repo"
@@ -61,37 +21,108 @@ export default function Home() {
   const [testCode, setTestCode] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isCreatingPR, setIsCreatingPR] = useState(false);
   const [prUrl, setPrUrl] = useState("");
+  const [totalFunctions, setTotalFunctions] = useState(0);
+  const [untestedFunctions, setUntestedFunctions] = useState(0);
+  const [error, setError] = useState("");
 
   async function analyzeRepo() {
     setIsAnalyzing(true);
     setPrUrl("");
     setTestCode("");
+    setError("");
 
-    setTimeout(() => {
-      setFunctions(mockFunctions);
-      setSelectedFunction(mockFunctions[0]);
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repoUrl }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze repository");
+      }
+
+      const data = await response.json();
+      setFunctions(data.functions);
+      setTotalFunctions(data.totalFunctions);
+      setUntestedFunctions(data.untestedFunctions);
+      
+      if (data.functions.length > 0) {
+        setSelectedFunction(data.functions[0]);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Error analyzing repository:", err);
+    } finally {
       setIsAnalyzing(false);
-    }, 900);
+    }
   }
 
   async function generateTest(item: FunctionItem) {
     setSelectedFunction(item);
     setIsGenerating(true);
     setPrUrl("");
+    setError("");
 
-    setTimeout(() => {
-      setTestCode(generatedTest);
+    try {
+      const response = await fetch("/api/generate-test", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ functionName: item.name }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate test");
+      }
+
+      const data = await response.json();
+      setTestCode(data.testCode);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Error generating test:", err);
+    } finally {
       setIsGenerating(false);
-    }, 1000);
+    }
   }
 
   async function createPR() {
-    setPrUrl("https://github.com/your-username/testforge-demo-repo/pull/1");
+    if (!testCode || !selectedFunction) return;
+
+    setIsCreatingPR(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/create-pr", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          testCode,
+          functionName: selectedFunction.name,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create pull request");
+      }
+
+      const data = await response.json();
+      setPrUrl(data.prUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Error creating PR:", err);
+    } finally {
+      setIsCreatingPR(false);
+    }
   }
 
-  const totalFunctions = functions.length;
-  const untestedFunctions = functions.filter((fn) => !fn.tested).length;
   const generatedTests = testCode ? 1 : 0;
   const timeSaved = generatedTests ? "45 min" : "0 min";
 
@@ -120,6 +151,14 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {error && (
+        <section className="mx-auto max-w-7xl px-6 pt-6">
+          <div className="rounded-xl border border-red-400/20 bg-red-500/10 p-4 text-sm text-red-100">
+            <strong>Error:</strong> {error}
+          </div>
+        </section>
+      )}
 
       <section className="mx-auto max-w-7xl px-6 py-8">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -251,10 +290,10 @@ export default function Home() {
 
               <button
                 onClick={createPR}
-                disabled={!testCode}
+                disabled={!testCode || isCreatingPR}
                 className="mt-4 w-full rounded-xl bg-green-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Create Pull Request
+                {isCreatingPR ? "Creating PR..." : "Create Pull Request"}
               </button>
 
               {prUrl && (
