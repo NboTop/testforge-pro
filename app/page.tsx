@@ -19,6 +19,7 @@ export default function Home() {
     null
   );
   const [testCode, setTestCode] = useState("");
+  const [testExplanation, setTestExplanation] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCreatingPR, setIsCreatingPR] = useState(false);
@@ -26,6 +27,7 @@ export default function Home() {
   const [totalFunctions, setTotalFunctions] = useState(0);
   const [untestedFunctions, setUntestedFunctions] = useState(0);
   const [error, setError] = useState("");
+  const [copySuccess, setCopySuccess] = useState(false);
 
   async function analyzeRepo() {
     setIsAnalyzing(true);
@@ -67,6 +69,7 @@ export default function Home() {
     setIsGenerating(true);
     setPrUrl("");
     setError("");
+    setCopySuccess(false);
 
     try {
       const response = await fetch("/api/generate-test", {
@@ -83,6 +86,7 @@ export default function Home() {
 
       const data = await response.json();
       setTestCode(data.testCode);
+      setTestExplanation(data.explanation || "");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       console.error("Error generating test:", err);
@@ -126,6 +130,16 @@ export default function Home() {
   const generatedTests = testCode ? 1 : 0;
   const timeSaved = generatedTests ? "45 min" : "0 min";
 
+  async function copyToClipboard() {
+    try {
+      await navigator.clipboard.writeText(testCode);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#070A12] text-white">
       <section className="border-b border-white/10 bg-[#0B1020]">
@@ -139,9 +153,7 @@ export default function Home() {
                 TestForge Pro
               </h1>
               <p className="mt-3 max-w-2xl text-sm text-slate-300">
-                Bob-assisted AI test generation for real repositories. Scan a
-                codebase, find untested functions, generate Jest tests, and
-                create pull requests faster.
+                A Bob-assisted workflow demo: identify untested functions, generate Jest tests, and simulate a pull request. API-backed demo mode — watsonx.ai and GitHub integration ready.
               </p>
             </div>
 
@@ -292,6 +304,22 @@ export default function Home() {
                   </code>
                 </pre>
               </div>
+
+              {testCode && (
+                <button
+                  onClick={copyToClipboard}
+                  className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+                >
+                  {copySuccess ? "✓ Copied to clipboard!" : "Copy test to clipboard"}
+                </button>
+              )}
+
+              {testExplanation && (
+                <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+                  <p className="text-xs font-medium text-slate-400 mb-2">What was generated:</p>
+                  <p className="text-sm text-slate-300 leading-relaxed">{testExplanation}</p>
+                </div>
+              )}
 
               <button
                 onClick={createPR}

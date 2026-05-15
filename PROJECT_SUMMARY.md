@@ -420,8 +420,8 @@ When fully integrated with watsonx.ai and GitHub:
 ## 📞 Support & Contact
 
 ### Repository
-- GitHub: [Your Repository URL]
-- Issues: [Issues URL]
+- GitHub: https://github.com/NboTop/testforge-pro
+- Issues: https://github.com/NboTop/testforge-pro/issues
 
 ### Documentation
 - README: Project overview

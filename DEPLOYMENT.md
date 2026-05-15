@@ -26,7 +26,7 @@ git add .
 git commit -m "Initial commit - TestForge Pro"
 
 # Add remote (replace with your repository URL)
-git remote add origin https://github.com/your-username/testforge-pro.git
+git remote add origin https://github.com/NboTop/testforge-pro.git
 
 # Push to GitHub
 git push -u origin main

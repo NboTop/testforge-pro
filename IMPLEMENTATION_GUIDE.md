@@ -1,3 +1,5 @@
+> **Note:** This document describes the intended implementation plan developed during the planning phase with IBM Bob. The current MVP implements a subset of this plan — API routes and dashboard workflow — in demo mode. The full architecture described here represents the production path. See `ARCHITECTURE.md` for the current implemented state.
+
 # TestForge Pro - Implementation Quick Start Guide
 
 This guide provides the exact commands and file creation order to implement the architecture defined in [`ARCHITECTURE.md`](testforge-pro/ARCHITECTURE.md).

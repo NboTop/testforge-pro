@@ -49,3 +49,14 @@ Each session export or manually saved session note follows this structure:
 ## Next Steps
 
 [What should happen next]
+
+## Session Index
+
+| Session | File | Mode | Focus |
+|---|---|---|---|
+| 1 | [001-architecture-planning.md](./001-architecture-planning.md) | Plan | MVP architecture and tech stack decisions |
+| 2 | [01-architecture-and-current-review.md](./01-architecture-and-current-review.md) | Plan | Architecture simplification and scope decisions |
+| 3 | [02-api-routes-and-test-generation.md](./02-api-routes-and-test-generation.md) | Code | API route implementation and dashboard integration |
+| 4 | [03-final-review-and-polish.md](./03-final-review-and-polish.md) | Code | Final review, deployment readiness, and submission prep |
+
+IBM Bob was used as a **development partner**, not as a runtime API. The application calls no Bob endpoints at runtime.
