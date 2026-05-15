@@ -9,6 +9,30 @@
 
 ---
 
+## 🎯 Current Status: Demonstration Mode
+
+> **⚠️ IMPORTANT: This MVP operates entirely in demonstration mode using simulated responses and mock data.**
+
+**No External Services Required:**
+- ✅ No IBM Cloud account needed
+- ✅ No watsonx.ai API credentials required
+- ✅ No GitHub tokens or authentication needed
+- ✅ No external API calls made
+- ✅ Works completely offline after installation
+- ✅ Zero configuration required to run
+
+**What This Means:**
+- All AI functionality uses pre-written mock responses
+- Repository analysis returns simulated data
+- Test generation uses pre-configured templates
+- Pull request workflow is demonstrated, not executed
+- **You can evaluate all features without any credentials**
+
+**Future Integration:**
+While the current version uses only simulated responses, the codebase includes a prepared API route architecture designed to facilitate future connection to IBM watsonx.ai Granite models when that integration is implemented.
+
+---
+
 ## 💡 The Problem
 
 Software teams struggle with test coverage gaps that lead to production bugs and technical debt. Writing comprehensive test suites is time-consuming, often taking **45+ minutes per function**, and developers frequently skip testing edge cases and error scenarios. This results in:
@@ -20,9 +44,11 @@ Software teams struggle with test coverage gaps that lead to production bugs and
 
 ## 🎯 The Solution
 
-TestForge Pro is an intelligent test generation platform that automatically detects untested functions in JavaScript/TypeScript repositories and generates comprehensive Jest test suites. Built as a proof-of-concept for IBM watsonx.ai integration, it demonstrates how AI can accelerate software quality assurance.
+TestForge Pro is an intelligent test generation platform that automatically detects untested functions in JavaScript/TypeScript repositories and generates comprehensive Jest test suites. This MVP version operates entirely in **demonstration mode** using simulated responses and mock data, requiring no external API credentials or authentication.
 
-**Key Innovation:** Combines static code analysis with AI-powered test generation to create production-ready test suites in seconds, not hours.
+**Key Innovation:** Demonstrates how AI-powered test generation could accelerate software quality assurance, with a prepared architecture for future IBM watsonx.ai integration.
+
+**Current Status:** This is a fully functional demonstration application that showcases the complete user experience and workflow without requiring any IBM Cloud accounts, API keys, or external service credentials.
 
 ---
 
@@ -46,24 +72,33 @@ Review the generated test code and click "Create Pull Request" to simulate the P
 
 ---
 
-## ✨ Features Implemented
+## ✨ Features Implemented (Demonstration Mode)
 
 ### Core Functionality
 - ✅ **Next.js Dashboard Interface** - Modern, responsive UI built with TypeScript and Tailwind CSS
-- ✅ **Repository Analysis API** (`/api/analyze`) - Simulates function detection and coverage analysis
-- ✅ **Test Generation API** (`/api/generate-test`) - Produces comprehensive Jest test suites
-- ✅ **PR Workflow API** (`/api/create-pr`) - Demonstrates pull request creation flow
-- ✅ **Mock Fallback System** - Reliable demo mode with pre-configured test scenarios
+- ✅ **Repository Analysis API** (`/api/analyze`) - Simulates function detection using mock data
+- ✅ **Test Generation API** (`/api/generate-test`) - Returns pre-written Jest test templates
+- ✅ **PR Workflow API** (`/api/create-pr`) - Simulates pull request creation workflow
+- ✅ **Mock Data System** - Complete demo experience with pre-configured scenarios
 - ✅ **Real-time Loading States** - Professional UX with loading indicators and transitions
 - ✅ **Error Handling** - User-friendly error messages and validation
 - ✅ **Responsive Design** - Mobile and desktop optimized interface
+- ✅ **Zero External Dependencies** - Runs completely without API credentials
 
 ### Demo Capabilities
-- 🎯 **3 Sample Functions** with realistic test scenarios
-- 📊 **Statistics Dashboard** showing coverage metrics
+- 🎯 **3 Sample Functions** with realistic test scenarios (pre-configured)
+- 📊 **Statistics Dashboard** showing simulated coverage metrics
 - 🔍 **Severity Ratings** (High/Medium/Low) for prioritization
 - 💻 **Code Preview** with syntax formatting
 - 🎨 **IBM Branding** with watsonx.ai attribution
+- 🚀 **Instant Setup** - No credentials, accounts, or configuration required
+
+### What's NOT Implemented (Planned for Future)
+- ❌ **Live watsonx.ai Integration** - Currently uses mock responses only
+- ❌ **Real GitHub API Calls** - Repository analysis is simulated
+- ❌ **Actual PR Creation** - PR workflow is demonstrated, not executed
+- ❌ **Code Parsing** - No AST/Babel analysis of real repositories
+- ❌ **Authentication** - No OAuth or credential management
 
 ---
 
@@ -111,23 +146,43 @@ All Bob interactions are preserved in `bob_sessions/`:
 
 ## 🔧 IBM Technologies
 
-### Currently Integrated
+### Currently Used in Development
 - **IBM Bob AI Assistant** - Development partner for architecture, coding, and documentation
-- **watsonx.ai Architecture** - Application designed for Granite model integration
+  - Used as a development tool, not as a runtime API
+  - All development sessions documented in `bob_sessions/`
 
-### Planned for Production
+### Current Application Status: Demonstration Mode Only
+
+**⚠️ Important: No Live watsonx.ai Integration**
+
+This MVP version **does not** connect to IBM watsonx.ai services or any external APIs. The application operates entirely in demonstration mode using:
+- **Simulated responses** for all AI-related functionality
+- **Mock data** for repository analysis and test generation
+- **Pre-configured test scenarios** that run locally without external calls
+
+**No credentials required:** You can run, test, and evaluate all application features without:
+- IBM Cloud accounts
+- watsonx.ai API keys
+- GitHub tokens
+- Any external service authentication
+
+### Future Integration Architecture
+
+While the current version uses only simulated responses, the codebase includes a **prepared API route architecture** designed to facilitate future connection to IBM watsonx.ai:
+
+**Planned for Future Production:**
 - **IBM watsonx.ai Granite Models** - For intelligent test generation
-  - Model: `ibm/granite-13b-instruct-v2`
-  - Capabilities: Code understanding, test case generation, edge case detection
+  - Target Model: `ibm/granite-13b-instruct-v2`
+  - Planned Capabilities: Code understanding, test case generation, edge case detection
 - **IBM Cloud Infrastructure** - For scalable deployment
 - **IBM Watson Code Assistant** - For enhanced code analysis
 
-### Integration Roadmap
-The application is architected with watsonx.ai integration in mind:
-- Environment variables configured for watsonx.ai credentials
-- API structure ready for Granite model calls
-- Prompt engineering framework prepared
-- Fallback system ensures demo reliability
+**Integration-Ready Architecture:**
+- Environment variable structure prepared for watsonx.ai credentials
+- API route layer designed for easy Granite model integration
+- Prompt engineering framework ready for implementation
+- Clear separation between demo mode and future production logic
+- Documented integration steps in `ARCHITECTURE.md`
 
 ---
 
@@ -261,21 +316,27 @@ Simulates creating a pull request with the generated test code.
 
 ## 🔐 Environment Variables
 
-Create a `.env.local` file in the project root:
+### ⚠️ No Credentials Required for Current Version
+
+**The application runs completely without any environment variables or credentials.** All features work out-of-the-box in demonstration mode.
+
+### Optional Configuration File
+
+If you want to prepare for future integrations, you can create a `.env.local` file, but **this is entirely optional** for the current MVP:
 
 ```bash
 # ============================================
-# GitHub API Configuration (Optional)
+# GitHub API Configuration (NOT USED - Future)
 # ============================================
-GITHUB_TOKEN=
+# GITHUB_TOKEN=
 
 # ============================================
-# IBM watsonx.ai Configuration (Optional)
+# IBM watsonx.ai Configuration (NOT USED - Future)
 # ============================================
-WATSONX_API_KEY=
-WATSONX_PROJECT_ID=
-WATSONX_REGION=us-south
-WATSONX_MODEL_ID=ibm/granite-13b-instruct-v2
+# WATSONX_API_KEY=
+# WATSONX_PROJECT_ID=
+# WATSONX_REGION=us-south
+# WATSONX_MODEL_ID=ibm/granite-13b-instruct-v2
 
 # ============================================
 # Application Configuration
@@ -284,7 +345,14 @@ NEXT_PUBLIC_DEMO_MODE=true
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-**Note:** All environment variables are optional for demo mode. The application works fully without any credentials configured.
+**Important Notes:**
+- ✅ **No IBM Cloud account needed** - Application runs entirely locally
+- ✅ **No watsonx.ai credentials needed** - All AI functionality is simulated
+- ✅ **No GitHub token needed** - Repository analysis uses mock data
+- ✅ **No external API calls** - Everything runs in demonstration mode
+- ✅ **Works offline** - No internet connection required after installation
+
+The environment variables shown above are **placeholders for future integration** and are not currently used by the application.
 
 ---
 
@@ -307,19 +375,15 @@ cd testforge-pro
 npm install
 ```
 
-3. **Set up environment variables** (optional)
-```bash
-cp .env.example .env.local
-# Edit .env.local if needed (not required for demo)
-```
-
-4. **Run the development server**
+3. **Run the development server** (no configuration needed)
 ```bash
 npm run dev
 ```
 
-5. **Open the application**
+4. **Open the application**
 Navigate to [http://localhost:3000](http://localhost:3000)
+
+**That's it!** No environment variables, credentials, or additional configuration required. The application works immediately in demonstration mode.
 
 ### Usage
 
@@ -331,31 +395,59 @@ Navigate to [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🎭 Demo Reliability
+## 🎭 Current Implementation: Demonstration Mode
 
-### Mock Fallback Mode
+### How the Application Works (MVP Version)
 
-TestForge Pro includes a sophisticated mock fallback system that ensures reliable demonstrations without external API dependencies.
+**⚠️ This version uses simulated responses and mock data exclusively.**
 
-**Why Mock Mode?**
-- ✅ **Zero Setup Required** - Works immediately without credentials
-- ✅ **Consistent Results** - Deterministic outputs for presentations
-- ✅ **No Rate Limits** - Unlimited demo runs
-- ✅ **Offline Capable** - Functions without internet connectivity
-- ✅ **Fast Response Times** - Instant feedback for better UX
+TestForge Pro currently operates in **demonstration mode only**, using a sophisticated mock system that simulates all AI and external API functionality. There is **no active connection** to IBM watsonx.ai, GitHub APIs, or any external services.
 
-**What's Simulated:**
-- Repository analysis and function detection
-- Test coverage gap identification
-- AI-powered test generation with realistic Jest code
-- Pull request workflow and GitHub integration
+### What's Simulated (Not Real API Calls)
 
-**Production Path:**
-The application is architected to seamlessly transition from mock mode to production:
-- Environment variable checks determine mode
-- API structure ready for real integrations
-- Clear separation between demo and production logic
-- Documented integration steps in `ARCHITECTURE.md`
+**All functionality uses pre-configured mock data:**
+
+1. **Repository Analysis** (`/api/analyze`)
+   - Simulates scanning a GitHub repository
+   - Returns pre-defined list of 3 sample functions
+   - No actual GitHub API calls or repository access
+
+2. **Test Generation** (`/api/generate-test`)
+   - Returns pre-written Jest test templates
+   - No watsonx.ai API calls or AI model inference
+   - Uses locally stored mock test code
+
+3. **Pull Request Creation** (`/api/create-pr`)
+   - Simulates PR workflow with mock response
+   - No actual GitHub commits or PR creation
+   - Returns simulated PR URL for demonstration
+
+### Why Demonstration Mode?
+
+- ✅ **Zero Setup Required** - Works immediately without any credentials
+- ✅ **No External Dependencies** - Runs completely offline after installation
+- ✅ **Consistent Results** - Deterministic outputs for reliable presentations
+- ✅ **No Rate Limits** - Unlimited demo runs without API quotas
+- ✅ **Fast Response Times** - Instant feedback without network latency
+- ✅ **No Costs** - No API usage fees or service charges
+
+### Future Production Architecture
+
+While the current version uses only simulated responses, the codebase is **architected for future integration**:
+
+**Integration-Ready Design:**
+- API routes structured to accept real watsonx.ai calls
+- Environment variable checks prepared for production mode
+- Clear separation between demo logic and integration points
+- Documented transition path in `ARCHITECTURE.md`
+
+**When watsonx.ai integration is implemented:**
+- Replace mock responses with actual Granite model API calls
+- Add authentication and credential management
+- Implement real GitHub repository scanning
+- Enable actual PR creation via GitHub API
+
+**Current Status:** Fully functional demonstration showcasing the complete user experience without requiring any external services or credentials.
 
 ---
 
@@ -421,20 +513,25 @@ The application is architected to seamlessly transition from mock mode to produc
 
 ### Project Highlights
 
-**Current Implementation:**
+**Current Implementation (Demonstration Mode):**
 - ✅ Next.js TypeScript dashboard with Tailwind CSS
-- ✅ Three functional API routes with proper error handling
-- ✅ Mock fallback system for reliable demonstrations
+- ✅ Three functional API routes with simulated responses
+- ✅ Mock data system for complete demo experience
 - ✅ Responsive design for mobile and desktop
 - ✅ Real-time loading states and user feedback
 - ✅ IBM Bob session documentation
+- ✅ **Zero external dependencies** - No credentials required
+- ✅ **Runs completely offline** after installation
 
-**Clearly Marked as Planned:**
-- 🔮 Live watsonx.ai API integration (architecture ready)
-- 🔮 Real GitHub repository scanning (API structure prepared)
-- 🔮 Actual PR creation via GitHub API (workflow designed)
-- 🔮 AST/Babel parser for code analysis (roadmap defined)
-- 🔮 Production authentication system (security planned)
+**Future Integration (Not Currently Implemented):**
+- 🔮 Live watsonx.ai API integration (architecture prepared, not connected)
+- 🔮 Real GitHub repository scanning (API structure ready, uses mock data)
+- 🔮 Actual PR creation via GitHub API (workflow designed, currently simulated)
+- 🔮 AST/Babel parser for code analysis (roadmap defined, not implemented)
+- 🔮 Production authentication system (security planned, not required for demo)
+
+**Important Clarification:**
+This MVP demonstrates the complete user experience and workflow using simulated responses. No external APIs are called, and no credentials are needed to run, test, or evaluate the application.
 
 ---
 
