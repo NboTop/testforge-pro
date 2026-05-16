@@ -334,23 +334,6 @@ TestForge Pro is a demonstration platform that simulates detecting untested Java
 
 ---
 
-## 🎬 Demo Flow
-
-### 1️⃣ **Repository Analysis**
-Enter a GitHub repository URL and click "Analyze Repository". The system simulates scanning the codebase to detect functions and their test coverage status.
-
-### 2️⃣ **Coverage Gap Detection**
-View a list of untested functions with severity ratings (High/Medium/Low) and explanations of why each function needs testing.
-
-### 3️⃣ **AI Test Generation**
-Select any untested function and click "Generate Test". The system produces a comprehensive Jest test suite with:
-- ✅ Normal case scenarios
-- ✅ Edge case handling
-- ✅ Error condition tests
-- ✅ Input validation checks
-
-### 4️⃣ **Pull Request Preview**
-Review the generated test code and click "Create Pull Request" to see a realistic PR workflow preview showing branch name, file path, commit message, and PR details that would be prepared for GitHub in production.
 
 ---
 
@@ -815,15 +798,17 @@ Development was completed during the hackathon window, with time focused on MVP 
 
 ### Project Highlights
 
-**Current Implementation (Demonstration Mode):**
+**Current Implementation:**
 - ✅ Next.js TypeScript dashboard with Tailwind CSS
-- ✅ Three functional API routes with simulated responses
-- ✅ Mock data system for complete demo experience
+- ✅ Three functional API routes (live GitHub scan, template generation, controlled PR creation)
+- ✅ Live public GitHub repository scanning via unauthenticated API
+- ✅ Controlled real PR creation for configured demo repository
+- ✅ Automatic simulated fallback for all other repositories
 - ✅ Responsive design for mobile and desktop
 - ✅ Real-time loading states and user feedback
 - ✅ IBM Bob session documentation
-- ✅ **Zero external dependencies** - No credentials required
-- ✅ **Runs completely offline** after installation
+- ✅ **Works in fallback mode without credentials**
+- ✅ **Live GitHub features require GitHub API access and optional server-side credentials**
 
 **Future Integration (Not Currently Implemented):**
 - 🔮 Live watsonx.ai API integration (architecture prepared, not connected)

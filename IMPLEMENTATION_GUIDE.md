@@ -461,6 +461,8 @@ async function generateTest(item: FunctionItem) {
 
 ## Phase 4: PR Workflow (Hours 18-22)
 
+> **⚠️ NOTE:** This section describes the original mock PR implementation and is superseded by the current controlled real PR implementation. See `ARCHITECTURE.md` and `app/api/create-pr/route.ts` for the actual implementation that creates real GitHub PRs for the configured demo repository with automatic fallback to simulated preview for all other repositories.
+
 ### Step 11: Create PR API Route
 
 **File:** `app/api/create-pr/route.ts`

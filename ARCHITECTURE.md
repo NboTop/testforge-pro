@@ -4,19 +4,17 @@
 
 ---
 
-## Current Implementation: Demo Mode
+## Current Implementation
 
-TestForge Pro is a Next.js application demonstrating an AI-assisted test generation workflow. The current MVP operates entirely in **demo mode** using mock data and simulated responses to showcase the intended user experience without requiring external API credentials.
+TestForge Pro is a Next.js application that demonstrates an AI-assisted test generation workflow. The MVP features live public GitHub repository scanning, regex-based function detection, template-based Jest test generation, controlled real GitHub PR creation for one configured demo repository, and automatic simulated preview fallback for all other repositories.
 
 ### Purpose
 
 This demonstration validates the complete developer workflow:
-1. Analyze a repository
-2. Identify untested functions
-3. Generate Jest tests
-4. Simulate a pull request workflow
-
-**Important:** No live integrations are currently implemented. All functionality uses pre-configured mock data to ensure reliable demonstrations without external dependencies.
+1. Analyze a repository (live scan for public repos or demo fallback)
+2. Identify untested functions (regex-based detection)
+3. Generate Jest tests (template-based generation)
+4. Create pull requests (real PR for configured demo repo, simulated preview for others)
 
 ---
 

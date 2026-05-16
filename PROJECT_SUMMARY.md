@@ -501,7 +501,7 @@ TestForge Pro represents a **solid proof of concept** that validates the vision 
 
 ### What We've Built
 1. **Working Dashboard**: Functional Next.js application with complete user interface
-2. **Three Operational API Routes**: Demo-mode endpoints proving the architecture
+2. **Operational API Routes**: Supporting live public GitHub scanning, template-based test generation, controlled real PR creation, simulated fallback, and health reporting
 3. **IBM Bob Partnership**: Documented collaboration throughout development lifecycle
 4. **watsonx.ai Integration Path**: System architected for IBM Granite model integration
 5. **Clear Production Roadmap**: Detailed plan for transitioning from demo to production
