@@ -15,12 +15,13 @@ type PRPreviewData = {
   success: boolean;
   mode: string;
   message: string;
-  repositoryUrl: string;
+  repositoryUrl?: string;
+  prUrl?: string;
   branchName: string;
   filePath: string;
   commitMessage: string;
   prTitle: string;
-  prBody: string;
+  prBody?: string;
   note: string;
 };
 
@@ -130,6 +131,7 @@ export default function Home() {
         body: JSON.stringify({
           testCode,
           functionName: selectedFunction.name,
+          repoUrl,
         }),
       });
 
@@ -371,10 +373,16 @@ export default function Home() {
                 <div className="mt-4 rounded-xl border border-green-400/20 bg-green-500/10 p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <h3 className="text-lg font-medium text-green-100">
-                      ✓ Demo PR Workflow Complete
+                      {prPreview.mode === "real-github-pr"
+                        ? "✓ Real GitHub PR Created"
+                        : "✓ PR Preview Generated"}
                     </h3>
-                    <span className="rounded-full bg-blue-500/20 px-2.5 py-0.5 text-xs font-medium text-blue-200">
-                      Simulated
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      prPreview.mode === "real-github-pr"
+                        ? "bg-green-500/30 text-green-100"
+                        : "bg-blue-500/20 text-blue-200"
+                    }`}>
+                      {prPreview.mode === "real-github-pr" ? "Live" : "Simulated"}
                     </span>
                   </div>
                   
@@ -416,14 +424,25 @@ export default function Home() {
                     <p className="text-xs text-green-100/70 mb-3">
                       {prPreview.note}
                     </p>
-                    <a
-                      href={prPreview.repositoryUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-500"
-                    >
-                      View project repository →
-                    </a>
+                    {prPreview.mode === "real-github-pr" && prPreview.prUrl ? (
+                      <a
+                        href={prPreview.prUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-500"
+                      >
+                        View pull request →
+                      </a>
+                    ) : (
+                      <a
+                        href={prPreview.repositoryUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-500"
+                      >
+                        View project repository →
+                      </a>
+                    )}
                   </div>
                 </div>
               )}

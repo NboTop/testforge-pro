@@ -54,11 +54,12 @@ TestForge Pro is an AI-powered test generation platform that demonstrates automa
 3. ✅ **Function Detection Display**: Shows detected functions from live scan or predefined demo data
 4. ✅ **Test Generation Preview**: Generates realistic Jest test code through mock AI provider
 5. ✅ **Test Code Formatting**: Syntax-highlighted preview of generated tests
-6. ✅ **PR Workflow Preview**: Displays realistic PR details (branch, file path, commit message) without creating actual PRs
+6. ✅ **Controlled GitHub PR Creation**: Real PR creation for one preconfigured demo repository with automatic fallback to simulated preview
 7. ✅ **Loading States**: Real-time feedback during operations
 8. ✅ **Error Handling**: Comprehensive user-friendly error messages
 9. ✅ **Responsive Design**: Mobile and desktop optimized interface
 10. ✅ **Scan Mode Indicator**: Visual badge showing live scan vs demo fallback status
+11. ✅ **PR Mode Indicator**: Visual badge showing real PR vs simulated preview status
 
 ### Code Quality
 - **Type Safety**: Full TypeScript coverage
@@ -90,12 +91,14 @@ TestForge Pro is an AI-powered test generation platform that demonstrates automa
 ✅ Valid TypeScript/Jest syntax
 ```
 
-**3. PR Preview (`/api/create-pr`)**
+**3. PR Creation (`/api/create-pr`)**
 ```bash
 ✅ POST request successful
-✅ Returns structured PR preview with branch, file path, commit details
-✅ Success message displayed with realistic workflow information
-✅ Response time: simulated delay for realistic UX
+✅ Creates real GitHub PR when configured demo repository matches
+✅ Returns simulated preview for all other repositories
+✅ Automatic fallback on any GitHub API errors
+✅ Server-side token handling with strict security
+✅ Response time: realistic for both real and simulated modes
 ```
 
 ### User Flow Testing

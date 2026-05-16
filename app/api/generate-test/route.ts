@@ -263,45 +263,45 @@ describe("${functionName}", () => {
 
 describe("calculateFinalPrice", () => {
   it("calculates final price with tax and discount", () => {
-    const basePrice = 100;
+    const subtotal = 100;
     const taxRate = 0.1;
     const discount = 10;
-    const result = calculateFinalPrice(basePrice, taxRate, discount);
-    expect(result).toBe(100); // (100 + 10) - 10 = 100
+    const result = calculateFinalPrice(subtotal, taxRate, discount);
+    expect(result).toBe(99); // (100 - 10) * 1.1 = 99.00
   });
 
-  it("throws an error for negative base price", () => {
+  it("throws an error for negative subtotal", () => {
     expect(() => calculateFinalPrice(-100, 0.1, 10)).toThrow(
-      "Base price cannot be negative"
+      "Subtotal cannot be negative"
     );
   });
 
   it("handles zero discount correctly", () => {
-    const basePrice = 100;
+    const subtotal = 100;
     const taxRate = 0.1;
     const discount = 0;
-    const result = calculateFinalPrice(basePrice, taxRate, discount);
-    expect(result).toBe(110); // 100 + (100 * 0.1) = 110
+    const result = calculateFinalPrice(subtotal, taxRate, discount);
+    expect(result).toBe(110); // (100 - 0) * 1.1 = 110.00
   });
 
   it("handles zero tax rate correctly", () => {
-    const basePrice = 100;
+    const subtotal = 100;
     const taxRate = 0;
     const discount = 10;
-    const result = calculateFinalPrice(basePrice, taxRate, discount);
-    expect(result).toBe(90); // 100 - 10 = 90
+    const result = calculateFinalPrice(subtotal, taxRate, discount);
+    expect(result).toBe(90); // (100 - 10) * 1.0 = 90.00
   });
 
   it("calculates correctly with high tax rate", () => {
-    const basePrice = 100;
+    const subtotal = 100;
     const taxRate = 0.25;
     const discount = 5;
-    const result = calculateFinalPrice(basePrice, taxRate, discount);
-    expect(result).toBe(120); // (100 + 25) - 5 = 120
+    const result = calculateFinalPrice(subtotal, taxRate, discount);
+    expect(result).toBe(118.75); // (100 - 5) * 1.25 = 118.75
   });
 });`;
         explanation =
-          "Generated comprehensive Jest tests covering normal calculation, error handling for negative prices, zero discount edge case, zero tax edge case, and high tax rate scenario. Tests verify correct arithmetic and error throwing behavior.";
+          "Generated comprehensive Jest tests covering normal calculation, error handling for negative subtotal, zero discount edge case, zero tax edge case, and high tax rate scenario. Tests verify correct arithmetic using the formula: discountedSubtotal = subtotal - discount, then final = discountedSubtotal * (1 + taxRate), rounded to 2 decimal places.";
         break;
 
       case "applyDiscountCode":

@@ -79,6 +79,58 @@ The system automatically falls back to demo mode when:
 
 ---
 
+## 🔗 Controlled GitHub PR Creation
+
+TestForge Pro now supports **real GitHub pull request creation** for one preconfigured demo repository, with automatic fallback to simulated preview for all other repositories.
+
+### How It Works
+
+- **Demo Repository Only**: Real PRs are created exclusively when environment variables `GITHUB_TOKEN`, `GITHUB_DEMO_OWNER`, and `GITHUB_DEMO_REPO` are configured
+- **Exact Match Required**: Repository URL must exactly match `https://github.com/${GITHUB_DEMO_OWNER}/${GITHUB_DEMO_REPO}`
+- **Automatic Fallback**: All other repositories automatically use simulated preview mode
+- **Server-Side Security**: GitHub token is never exposed to frontend or included in responses
+
+### Configuration
+
+To enable real PR creation for your demo repository, add these environment variables to `.env.local`:
+
+```bash
+GITHUB_TOKEN=your_github_personal_access_token
+GITHUB_DEMO_OWNER=your-github-username
+GITHUB_DEMO_REPO=your-demo-repo-name
+```
+
+**Security Notes:**
+- Token is handled exclusively server-side
+- Never logged to console or files
+- Never included in API responses
+- Only works for the exact configured repository
+
+### Real PR Creation Flow
+
+When configured and repository matches:
+1. Fetches repository metadata to get default branch
+2. Creates new branch: `testforge/add-tests-[function-name]-[timestamp]`
+3. Commits test file to new branch
+4. Creates pull request with detailed description
+5. Returns PR URL for immediate viewing
+
+### Fallback Behavior
+
+Simulated preview is used when:
+- Repository URL doesn't match configured demo repository
+- Environment variables are not set
+- GitHub API calls fail or throw errors
+- Any network or authentication issues occur
+
+### Future Plans
+
+- **OAuth Integration**: Support arbitrary repositories via user authentication
+- **Multi-Repository Support**: Configure multiple demo repositories
+- **Enhanced PR Templates**: Customizable PR descriptions and labels
+
+---
+
 ## 💡 The Problem
 
 Software teams struggle with test coverage gaps that lead to production bugs and technical debt. Writing comprehensive test suites is time-consuming, often taking **45+ minutes per function**, and developers frequently skip testing edge cases and error scenarios. This results in:
@@ -124,7 +176,7 @@ Review the generated test code and click "Create Pull Request" to see a realisti
 - ✅ **Next.js Dashboard Interface** - Modern, responsive UI built with TypeScript and Tailwind CSS
 - ✅ **Repository Analysis API** (`/api/analyze`) - Simulates function detection using mock data
 - ✅ **Test Generation API** (`/api/generate-test`) - Returns pre-written Jest test templates
-- ✅ **PR Preview API** (`/api/create-pr`) - Returns structured PR workflow preview with branch, file path, and commit details
+- ✅ **PR Creation API** (`/api/create-pr`) - Real GitHub PR creation for configured demo repository with automatic fallback to simulated preview
 - ✅ **Mock Data System** - Complete demo experience with pre-configured scenarios
 - ✅ **Real-time Loading States** - Professional UX with loading indicators and transitions
 - ✅ **Error Handling** - User-friendly error messages and validation
@@ -141,10 +193,9 @@ Review the generated test code and click "Create Pull Request" to see a realisti
 
 ### What's NOT Implemented (Planned for Future)
 - ❌ **Live watsonx.ai Integration** - Currently uses mock responses only
-- ❌ **Real GitHub API Calls** - Repository analysis uses optional live scan or demo fallback
-- ❌ **Actual PR Creation** - PR workflow preview prepared, not executed (requires GitHub authentication)
+- ❌ **OAuth-Based PR Creation** - Real PR creation limited to one preconfigured demo repository
 - ❌ **Code Parsing** - Limited regex-based detection (AST/Babel analysis planned)
-- ❌ **Authentication** - No OAuth or credential management
+- ❌ **Multi-Repository PR Support** - OAuth authentication for arbitrary repositories planned
 
 ---
 
@@ -338,29 +389,45 @@ Generates a comprehensive Jest test suite for a specified function.
 
 ### POST `/api/create-pr`
 
-Prepares a realistic PR workflow preview showing what would be created in production.
+Creates a real GitHub pull request for the configured demo repository, or returns a simulated preview for all other repositories.
 
 **Request Body:**
 ```json
 {
   "testCode": "import { calculateFinalPrice }...",
-  "functionName": "calculateFinalPrice"
+  "functionName": "calculateFinalPrice",
+  "repoUrl": "https://github.com/username/repo"
 }
 ```
 
-**Response:**
+**Response (Real PR - when configured):**
+```json
+{
+  "success": true,
+  "mode": "real-github-pr",
+  "message": "Successfully created pull request #123 in owner/repo",
+  "prUrl": "https://github.com/owner/repo/pull/123",
+  "branchName": "testforge/add-tests-calculatefinalprice-1234567890",
+  "filePath": "__tests__/calculatefinalprice.test.ts",
+  "commitMessage": "test: add Jest tests for calculateFinalPrice",
+  "prTitle": "Add tests for calculateFinalPrice",
+  "note": "This is a real GitHub pull request created in the configured demo repository."
+}
+```
+
+**Response (Simulated - default):**
 ```json
 {
   "success": true,
   "mode": "simulated-pr-preview",
-  "message": "No real PR was created in demo mode. This preview shows what would be prepared for GitHub.",
-  "repositoryUrl": "https://github.com/NboTop/testforge-pro",
+  "message": "No real PR was created. This preview shows what would be prepared for GitHub.",
+  "repositoryUrl": "https://github.com/username/repo",
   "branchName": "testforge/add-tests-calculatefinalprice",
   "filePath": "__tests__/calculatefinalprice.test.ts",
   "commitMessage": "test: add Jest tests for calculateFinalPrice",
   "prTitle": "Add tests for calculateFinalPrice",
   "prBody": "This simulated pull request would add generated Jest tests...",
-  "note": "Real PR creation requires GitHub authentication and write permissions. This MVP prepares request details without modifying any repository."
+  "note": "Real PR creation is only available for the configured demo repository."
 }
 ```
 
@@ -378,9 +445,11 @@ If you want to prepare for future integrations, you can create a `.env.local` fi
 
 ```bash
 # ============================================
-# GitHub API Configuration (NOT USED - Future)
+# GitHub API Configuration (Optional - Demo PR Creation)
 # ============================================
-# GITHUB_TOKEN=
+# GITHUB_TOKEN=your_github_personal_access_token
+# GITHUB_DEMO_OWNER=your-github-username
+# GITHUB_DEMO_REPO=your-demo-repo-name
 
 # ============================================
 # IBM watsonx.ai Configuration (NOT USED - Future)
