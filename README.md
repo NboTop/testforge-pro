@@ -9,6 +9,22 @@
 
 ---
 
+## 🌐 Live Demo
+
+**🚀 Try TestForge Pro Now:** [https://testforge-void.vercel.app/](https://testforge-void.vercel.app/)
+
+**🔍 Health Check Endpoint:** [https://testforge-void.vercel.app/api/health](https://testforge-void.vercel.app/api/health)
+
+The application is deployed on Vercel and fully functional. You can:
+- Analyze public GitHub repositories
+- Generate Jest test templates
+- View the complete workflow demonstration
+- Check system health and configuration status
+
+**Note:** The health endpoint shows `watsonxConfigured: false` as the watsonx.ai API key is not configured in production. The application uses template-based test generation and is architecturally watsonx.ai-ready.
+
+---
+
 ## 🎯 Current Status: Demonstration Mode
 
 > **⚠️ IMPORTANT: This MVP operates entirely in demonstration mode using simulated responses and mock data.**

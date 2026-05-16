@@ -4,11 +4,21 @@
 
 ---
 
+## 🌐 Live Deployment
+
+**Production URL:** [https://testforge-void.vercel.app/](https://testforge-void.vercel.app/)
+
+**Health Check:** [https://testforge-void.vercel.app/api/health](https://testforge-void.vercel.app/api/health)
+
+The application is deployed on Vercel and fully operational. The health endpoint reports `watsonxConfigured: false` as live watsonx.ai inference is not configured. The system uses template-based test generation and is architecturally watsonx.ai-ready.
+
+---
+
 ## 🎯 Project Overview
 
 TestForge Pro is a test generation workflow demonstration platform that showcases automated detection of untested functions in JavaScript/TypeScript repositories and generates Jest test starter templates. The system features live public GitHub repository scanning, controlled real PR creation for one configured demo repository, and automatic fallback to simulated preview for all other repositories.
 
-**Current Status:** ✅ **Functional Demo with Live GitHub Integration** | **Honest About Limitations**
+**Current Status:** ✅ **Functional Demo with Live GitHub Integration** | **Deployed on Vercel** | **Honest About Limitations**
 
 **Implementation State:** Working MVP with live public GitHub scanning using unauthenticated API, regex-based function detection, template-based test generation, real PR creation for configured demo repository only, and simulated PR preview fallback for all other repositories. Architecture prepared for future watsonx.ai integration.
 

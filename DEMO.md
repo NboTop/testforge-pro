@@ -8,7 +8,7 @@
 
 > "Every developer knows the pain of coverage debt. You ship features fast, but tests lag behind. What if you could go from 'I need tests for this function' to a real pull request in under 2 minutes?"
 
-**[Open TestForge Pro dashboard at localhost:3000]**
+**[Open TestForge Pro dashboard at https://testforge-void.vercel.app/]**
 
 > "I'm going to show you TestForge Pro—a platform that accelerates the journey from conceptual ideas to measurable impact in production codebases. Watch as we analyze a real repository, generate comprehensive tests, and create an actual GitHub pull request—all live, right now."
 
@@ -156,7 +156,7 @@
 ## 📋 Demo Checklist
 
 ### Pre-Demo Setup
-- [ ] Ensure TestForge Pro is running at localhost:3000
+- [ ] Ensure TestForge Pro is accessible at https://testforge-void.vercel.app/
 - [ ] Verify `.env.local` has GITHUB_TOKEN, GITHUB_DEMO_OWNER, GITHUB_DEMO_REPO configured
 - [ ] Confirm demo repository (void-logic/testforge-demo-target) is accessible
 - [ ] Test the complete workflow once before live demo
