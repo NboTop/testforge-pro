@@ -33,6 +33,52 @@ While the current version uses only simulated responses, the codebase includes a
 
 ---
 
+## 🔍 Optional Live GitHub Scan
+
+TestForge Pro now includes **optional live scanning of public GitHub repositories** without requiring any credentials or authentication. This feature provides a glimpse into real repository analysis while maintaining the demo fallback for reliability.
+
+### How It Works
+
+- **Public Repository Support**: Enter any public GitHub repository URL (format: `https://github.com/owner/repo`)
+- **Unauthenticated API**: Uses GitHub's public API without requiring tokens or authentication
+- **Regex-Based Detection**: Detects exported functions using pattern matching on source code
+- **Automatic Fallback**: Falls back to demo mode for private repos, rate limits, errors, or when no functions are detected
+
+### What's Detected
+
+The live scan:
+- ✅ Fetches repository metadata and file tree from GitHub's public API
+- ✅ Filters JavaScript/TypeScript source files (`.ts`, `.tsx`, `.js`, `.jsx`)
+- ✅ Excludes test files, build artifacts, and dependencies
+- ✅ Detects exported functions using regex patterns
+- ✅ Assigns severity based on file paths (payment/auth/security = High, validation/parser/api = Medium, others = Low)
+- ✅ Limits scan to first 8 files and up to 10 functions for performance
+
+### What's NOT Yet Implemented
+
+- ❌ **Real Test Coverage Verification**: Does not check if tests actually exist or verify coverage
+- ❌ **AST-Based Analysis**: Uses regex instead of Abstract Syntax Tree parsing
+- ❌ **Private Repository Access**: Only works with public repositories
+- ❌ **Authenticated Scanning**: No OAuth or token-based authentication
+
+### Fallback Behavior
+
+The system automatically falls back to demo mode when:
+- Repository URL is invalid or malformed
+- Repository is private or inaccessible
+- GitHub API rate limits are reached
+- No functions are detected in the scanned files
+- Network errors or API failures occur
+
+### Future Roadmap
+
+- **AST-Based Coverage Verification**: Parse code structure for accurate analysis
+- **Real Test Detection**: Verify actual test file existence and coverage
+- **Authenticated Access**: Support private repositories via OAuth
+- **Enhanced Analysis**: Deeper code understanding with IBM watsonx.ai integration
+
+---
+
 ## 💡 The Problem
 
 Software teams struggle with test coverage gaps that lead to production bugs and technical debt. Writing comprehensive test suites is time-consuming, often taking **45+ minutes per function**, and developers frequently skip testing edge cases and error scenarios. This results in:

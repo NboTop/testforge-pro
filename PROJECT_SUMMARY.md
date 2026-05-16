@@ -48,15 +48,17 @@ TestForge Pro is an AI-powered test generation platform that demonstrates automa
 - **Styling**: Tailwind CSS for modern UI
 - **API Design**: RESTful endpoints with proper error handling
 
-### Features Implemented (Demo Mode with Mock Data)
-1. ✅ **Repository Analysis UI**: Functional input and workflow display using demo data
-2. ✅ **Function Detection Display**: Shows 3 predefined sample functions with severity indicators
-3. ✅ **Test Generation Preview**: Generates realistic Jest test code through mock AI provider
-4. ✅ **Test Code Formatting**: Syntax-highlighted preview of generated tests
-5. ✅ **PR Workflow Simulation**: Demonstrates intended GitHub integration without creating actual PRs
-6. ✅ **Loading States**: Real-time feedback during simulated operations
-7. ✅ **Error Handling**: Comprehensive user-friendly error messages
-8. ✅ **Responsive Design**: Mobile and desktop optimized interface
+### Features Implemented
+1. ✅ **Optional Live GitHub Scan**: Scans public repositories using unauthenticated GitHub API with regex-based function detection
+2. ✅ **Repository Analysis UI**: Functional input and workflow display with live scan or demo fallback
+3. ✅ **Function Detection Display**: Shows detected functions from live scan or predefined demo data
+4. ✅ **Test Generation Preview**: Generates realistic Jest test code through mock AI provider
+5. ✅ **Test Code Formatting**: Syntax-highlighted preview of generated tests
+6. ✅ **PR Workflow Simulation**: Demonstrates intended GitHub integration without creating actual PRs
+7. ✅ **Loading States**: Real-time feedback during operations
+8. ✅ **Error Handling**: Comprehensive user-friendly error messages
+9. ✅ **Responsive Design**: Mobile and desktop optimized interface
+10. ✅ **Scan Mode Indicator**: Visual badge showing live scan vs demo fallback status
 
 ### Code Quality
 - **Type Safety**: Full TypeScript coverage
@@ -170,14 +172,22 @@ The current MVP operates entirely with mock data to provide a reliable, dependen
 **What's Working Now:**
 - ✅ **Next.js Dashboard**: Fully functional UI with all user interactions
 - ✅ **Three API Routes**: `/api/analyze`, `/api/generate-test`, `/api/create-pr` operational
-- ✅ **Mock Data System**: Reliable demo data for consistent presentations
+- ✅ **Optional Live GitHub Scan**: Public repository scanning with unauthenticated GitHub API
+- ✅ **Regex-Based Function Detection**: Detects exported functions in live scans
+- ✅ **Automatic Fallback System**: Demo data for private repos, rate limits, or errors
 - ✅ **Complete User Flow**: End-to-end workflow demonstration
 
-**What Uses Mock/Demo Data:**
-1. **Repository Scanning**: Displays predefined sample functions (GitHub API integration designed but not implemented)
-2. **Function Detection**: Returns 3 hardcoded demo functions (AST parsing architecture planned)
-3. **AI Test Generation**: Mock provider generates realistic Jest tests (watsonx.ai integration architected for production)
-4. **PR Creation**: Simulates workflow with mock URL (GitHub OAuth and PR API designed but not connected)
+**Live GitHub Scan Implementation:**
+1. **Public Repository Scanning**: Uses GitHub's unauthenticated API to fetch repo metadata and file trees
+2. **Function Detection**: Regex-based pattern matching for exported functions (not AST-based yet)
+3. **Severity Assignment**: Deterministic severity based on file paths (payment/auth = High, etc.)
+4. **Limitations**: No real coverage verification, public repos only, regex-based detection
+5. **Fallback**: Automatically uses demo data when live scan unavailable or unsuccessful
+
+**What Still Uses Mock/Demo Data:**
+1. **AI Test Generation**: Mock provider generates realistic Jest tests (watsonx.ai integration planned)
+2. **PR Creation**: Simulates workflow with mock URL (GitHub OAuth and PR API designed but not connected)
+3. **Coverage Verification**: Does not verify if tests actually exist (AST-based analysis planned)
 
 ### Why This Approach?
 - **Hackathon Reliability**: Zero external dependencies ensure consistent demos
@@ -313,13 +323,14 @@ When fully integrated with watsonx.ai and GitHub:
 
 ## 🔮 Production Implementation Roadmap
 
-### Phase 1: Core Integration (Post-Hackathon Priority)
-**Objective:** Replace mock data with production APIs
+### Phase 1: Enhanced Integration (Post-Hackathon Priority)
+**Objective:** Enhance current implementation with production-grade features
 
 - [ ] **IBM watsonx.ai Integration**: Connect to Granite model for actual AI-powered test generation
-- [ ] **GitHub Repository Scanning**: Implement GitHub API for real repository access and file retrieval
-- [ ] **AST Code Analysis**: Add Babel/TypeScript parser for actual function detection and code analysis
-- [ ] **GitHub PR Creation**: Enable real pull request creation with OAuth authentication
+- [ ] **AST Code Analysis**: Replace regex-based detection with Babel/TypeScript parser for accurate analysis
+- [ ] **Real Coverage Verification**: Implement actual test file detection and coverage verification
+- [ ] **Authenticated GitHub Access**: Add OAuth for private repository support
+- [ ] **GitHub PR Creation**: Enable real pull request creation with branch commits
 - [ ] **Environment Configuration**: Production API keys and security setup
 
 **Estimated Timeline:** 2-3 weeks post-hackathon

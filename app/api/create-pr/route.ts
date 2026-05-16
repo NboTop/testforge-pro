@@ -23,9 +23,9 @@ export async function POST(request: Request) {
     const response: CreatePRResponse = {
       success: true,
       mode: "demo",
-      prUrl: "https://github.com/your-username/testforge-demo-repo/pull/1",
+      prUrl: "https://github.com/NboTop/testforge-pro/pull/demo",
       message:
-        "Demo PR workflow completed. In production, this would create a branch, commit the generated test, and open a GitHub pull request.",
+        "This is a simulated PR URL for demo purposes. In production, this would create a branch, commit the generated test, and open a GitHub pull request.",
     };
 
     return NextResponse.json(response);

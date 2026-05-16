@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 type FunctionItem = {
+  id?: string;
   name: string;
   file: string;
   tested: boolean;
@@ -20,6 +21,7 @@ export default function Home() {
   );
   const [testCode, setTestCode] = useState("");
   const [testExplanation, setTestExplanation] = useState("");
+  const [testFilename, setTestFilename] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCreatingPR, setIsCreatingPR] = useState(false);
@@ -28,6 +30,8 @@ export default function Home() {
   const [untestedFunctions, setUntestedFunctions] = useState(0);
   const [error, setError] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
+  const [scanMode, setScanMode] = useState<"live-github-scan" | "demo-fallback">("demo-fallback");
+  const [scanNote, setScanNote] = useState("");
 
   async function analyzeRepo() {
     setIsAnalyzing(true);
@@ -52,6 +56,8 @@ export default function Home() {
       setFunctions(data.functions);
       setTotalFunctions(data.totalFunctions);
       setUntestedFunctions(data.untestedFunctions);
+      setScanMode(data.mode || "demo-fallback");
+      setScanNote(data.note || "");
       
       if (data.functions.length > 0) {
         setSelectedFunction(data.functions[0]);
@@ -87,6 +93,7 @@ export default function Home() {
       const data = await response.json();
       setTestCode(data.testCode);
       setTestExplanation(data.explanation || "");
+      setTestFilename(data.filename || `${item.name}.test.ts`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       console.error("Error generating test:", err);
@@ -161,8 +168,14 @@ export default function Home() {
               <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
                 Built with IBM Bob + watsonx.ai
               </div>
-              <div className="rounded-2xl border border-blue-400/30 bg-blue-500/10 px-4 py-3 text-xs text-blue-200">
-                Demo Mode · Mock Fallback Active (watsonx.ai-ready)
+              <div className={`rounded-2xl border px-4 py-3 text-xs ${
+                scanMode === "live-github-scan"
+                  ? "border-green-400/30 bg-green-500/10 text-green-200"
+                  : "border-blue-400/30 bg-blue-500/10 text-blue-200"
+              }`}>
+                {scanMode === "live-github-scan"
+                  ? "Live GitHub Scan · Public Repo Data"
+                  : "Demo Mode · Mock Fallback Active"}
               </div>
             </div>
           </div>
@@ -173,6 +186,18 @@ export default function Home() {
         <section className="mx-auto max-w-7xl px-6 pt-6">
           <div className="rounded-xl border border-red-400/20 bg-red-500/10 p-4 text-sm text-red-100">
             <strong>Error:</strong> {error}
+          </div>
+        </section>
+      )}
+
+      {scanNote && (
+        <section className="mx-auto max-w-7xl px-6 pt-6">
+          <div className={`rounded-xl border p-4 text-sm ${
+            scanMode === "live-github-scan"
+              ? "border-green-400/20 bg-green-500/10 text-green-100"
+              : "border-blue-400/20 bg-blue-500/10 text-blue-100"
+          }`}>
+            <strong>ℹ️ Scan Info:</strong> {scanNote}
           </div>
         </section>
       )}
@@ -231,9 +256,9 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {functions.map((item) => (
+                  {functions.map((item, index) => (
                     <div
-                      key={item.name}
+                      key={item.id || `${item.name}-${item.file}-${index}`}
                       className={`rounded-xl border p-4 transition ${
                         selectedFunction?.name === item.name
                           ? "border-blue-400/60 bg-blue-500/10"
@@ -292,9 +317,9 @@ export default function Home() {
 
               <div className="mt-5 rounded-xl border border-white/10 bg-black/40">
                 <div className="border-b border-white/10 px-4 py-3 text-xs text-slate-400">
-                  {selectedFunction
+                  {testFilename || (selectedFunction
                     ? `${selectedFunction.name}.test.ts`
-                    : "No function selected"}
+                    : "No function selected")}
                 </div>
                 <pre className="min-h-[420px] overflow-auto p-4 text-xs leading-6 text-slate-200">
                   <code>

@@ -41,15 +41,13 @@ This demonstration validates the complete developer workflow:
 
 ## Current API Routes
 
-All routes return simulated responses using mock data:
-
 | Route | Method | Current Behavior |
 |---|---:|---|
-| `/api/analyze` | POST | Returns pre-configured list of 3 sample functions with mock coverage data |
+| `/api/analyze` | POST | **Optional live GitHub scan** for public repositories using unauthenticated API, with automatic fallback to demo data. Detects exported functions using regex patterns. |
 | `/api/generate-test` | POST | Returns pre-written Jest test templates from local mock data |
 | `/api/create-pr` | POST | Returns simulated PR workflow response with mock URL |
 
-**Note:** No external API calls are made. All responses are generated locally using hardcoded mock data.
+**Note:** The `/api/analyze` route now supports optional live scanning of public GitHub repositories without authentication. It falls back to demo data for private repos, rate limits, errors, or when no functions are detected.
 
 ---
 
@@ -58,9 +56,24 @@ All routes return simulated responses using mock data:
 ```
 User enters repository URL
         ↓
-POST /api/analyze (returns mock data)
+POST /api/analyze
         ↓
-App displays 3 pre-configured sample functions
+    ┌─────────────────────────────────────┐
+    │ Valid public GitHub URL?            │
+    └─────────────────────────────────────┘
+            ↓ Yes                ↓ No
+    Live GitHub Scan      Demo Fallback
+    (regex-based)         (mock data)
+            ↓                    ↓
+    ┌─────────────────────────────────────┐
+    │ Functions detected?                 │
+    └─────────────────────────────────────┘
+            ↓ Yes                ↓ No
+    Return live data      Return demo data
+            ↓                    ↓
+    ┌─────────────────────────────────────┐
+    │ App displays detected functions     │
+    └─────────────────────────────────────┘
         ↓
 User selects a function
         ↓
@@ -77,7 +90,23 @@ App displays mock PR URL (no actual PR created)
 
 ---
 
-## What's NOT Implemented
+## Current MVP Features
+
+### ✅ Optional Public GitHub Repository Scanning
+- **Live scanning** of public GitHub repositories without authentication
+- **Unauthenticated GitHub API** access for repository metadata and file trees
+- **Regex-based function detection** for exported functions
+- **Automatic fallback** to demo mode for private repos, rate limits, or errors
+- **Severity assignment** based on file paths (payment/auth/security = High, etc.)
+- **Limited scope**: First 8 files, up to 10 functions for performance
+
+### ⚠️ Limitations of Current Implementation
+- **No real coverage verification**: Does not check if tests actually exist
+- **Regex-based only**: No AST parsing for accurate code analysis
+- **Public repos only**: No support for private repositories
+- **No authentication**: Uses unauthenticated GitHub API (rate limited)
+
+## What's NOT Yet Implemented
 
 The following features are **not currently implemented** and are planned for future production versions:
 
@@ -86,17 +115,17 @@ The following features are **not currently implemented** and are planned for fut
 - No real AI inference or model API calls
 - Test generation uses pre-written templates only
 
-### ❌ Real GitHub API Integration
-- No GitHub repository scanning or file access
+### ❌ Authenticated GitHub Integration
+- No GitHub OAuth or token-based authentication
 - No actual pull request creation
-- No GitHub OAuth or authentication
-- Repository analysis returns hardcoded sample data
+- No private repository access
+- No branch creation or commits
 
-### ❌ Code Parsing & Analysis
-- No AST (Abstract Syntax Tree) parsing
+### ❌ AST-Based Code Analysis
+- No Abstract Syntax Tree parsing
 - No Babel or TypeScript compiler integration
-- No actual code analysis of real repositories
-- Function detection is simulated with mock data
+- No real test coverage verification
+- Function detection uses regex patterns only
 
 ### ❌ Authentication & Security
 - No user authentication system
@@ -108,7 +137,7 @@ The following features are **not currently implemented** and are planned for fut
 
 ## Intended Future Production Architecture
 
-### Phase 1: Core Integrations (Post-Hackathon)
+### Phase 1: Enhanced Integrations (Post-Hackathon)
 
 **IBM watsonx.ai Integration:**
 - Connect to IBM Granite model (`ibm/granite-13b-instruct-v2`)
@@ -116,17 +145,17 @@ The following features are **not currently implemented** and are planned for fut
 - Add streaming responses for real-time feedback
 - Handle API authentication and rate limiting
 
-**GitHub API Integration:**
-- Implement GitHub OAuth for user authentication
-- Add repository scanning via GitHub REST API
-- Enable file content retrieval and parsing
-- Implement actual PR creation with commits
+**Enhanced GitHub Integration:**
+- Implement GitHub OAuth for authenticated access
+- Add support for private repositories
+- Enable actual PR creation with branch commits
+- Implement real test coverage verification
 
-**Code Analysis:**
+**AST-Based Code Analysis:**
 - Integrate Babel parser for JavaScript/TypeScript AST
-- Implement function detection and signature extraction
-- Add test coverage analysis
-- Build code complexity metrics
+- Replace regex-based detection with accurate parsing
+- Implement real test file detection and coverage verification
+- Add code complexity metrics and deeper analysis
 
 ### Phase 2: Enhanced Features
 
