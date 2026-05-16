@@ -113,8 +113,8 @@ Select any untested function and click "Generate Test". The system produces a co
 - ✅ Error condition tests
 - ✅ Input validation checks
 
-### 4️⃣ **Pull Request Workflow**
-Review the generated test code and click "Create Pull Request" to simulate the PR creation workflow that would commit tests to your repository.
+### 4️⃣ **Pull Request Preview**
+Review the generated test code and click "Create Pull Request" to see a realistic PR workflow preview showing branch name, file path, commit message, and PR details that would be prepared for GitHub in production.
 
 ---
 
@@ -124,7 +124,7 @@ Review the generated test code and click "Create Pull Request" to simulate the P
 - ✅ **Next.js Dashboard Interface** - Modern, responsive UI built with TypeScript and Tailwind CSS
 - ✅ **Repository Analysis API** (`/api/analyze`) - Simulates function detection using mock data
 - ✅ **Test Generation API** (`/api/generate-test`) - Returns pre-written Jest test templates
-- ✅ **PR Workflow API** (`/api/create-pr`) - Simulates pull request creation workflow
+- ✅ **PR Preview API** (`/api/create-pr`) - Returns structured PR workflow preview with branch, file path, and commit details
 - ✅ **Mock Data System** - Complete demo experience with pre-configured scenarios
 - ✅ **Real-time Loading States** - Professional UX with loading indicators and transitions
 - ✅ **Error Handling** - User-friendly error messages and validation
@@ -141,9 +141,9 @@ Review the generated test code and click "Create Pull Request" to simulate the P
 
 ### What's NOT Implemented (Planned for Future)
 - ❌ **Live watsonx.ai Integration** - Currently uses mock responses only
-- ❌ **Real GitHub API Calls** - Repository analysis is simulated
-- ❌ **Actual PR Creation** - PR workflow is demonstrated, not executed
-- ❌ **Code Parsing** - No AST/Babel analysis of real repositories
+- ❌ **Real GitHub API Calls** - Repository analysis uses optional live scan or demo fallback
+- ❌ **Actual PR Creation** - PR workflow preview prepared, not executed (requires GitHub authentication)
+- ❌ **Code Parsing** - Limited regex-based detection (AST/Babel analysis planned)
 - ❌ **Authentication** - No OAuth or credential management
 
 ---
@@ -338,7 +338,7 @@ Generates a comprehensive Jest test suite for a specified function.
 
 ### POST `/api/create-pr`
 
-Simulates creating a pull request with the generated test code.
+Prepares a realistic PR workflow preview showing what would be created in production.
 
 **Request Body:**
 ```json
@@ -352,9 +352,15 @@ Simulates creating a pull request with the generated test code.
 ```json
 {
   "success": true,
-  "mode": "demo",
-  "prUrl": "https://github.com/your-username/testforge-demo-repo/pull/1",
-  "message": "Demo PR workflow completed. In production, this would create a branch, commit the generated test, and open a GitHub pull request."
+  "mode": "simulated-pr-preview",
+  "message": "No real PR was created in demo mode. This preview shows what would be prepared for GitHub.",
+  "repositoryUrl": "https://github.com/NboTop/testforge-pro",
+  "branchName": "testforge/add-tests-calculatefinalprice",
+  "filePath": "__tests__/calculatefinalprice.test.ts",
+  "commitMessage": "test: add Jest tests for calculateFinalPrice",
+  "prTitle": "Add tests for calculateFinalPrice",
+  "prBody": "This simulated pull request would add generated Jest tests...",
+  "note": "Real PR creation requires GitHub authentication and write permissions. This MVP prepares request details without modifying any repository."
 }
 ```
 
@@ -463,10 +469,11 @@ TestForge Pro currently operates in **demonstration mode only**, using a sophist
    - No watsonx.ai API calls or AI model inference
    - Uses locally stored mock test code
 
-3. **Pull Request Creation** (`/api/create-pr`)
-   - Simulates PR workflow with mock response
+3. **Pull Request Preview** (`/api/create-pr`)
+   - Prepares realistic PR workflow preview with structured details
    - No actual GitHub commits or PR creation
-   - Returns simulated PR URL for demonstration
+   - Returns branch name, file path, commit message, and PR details
+   - Clarifies that real PR creation requires GitHub authentication
 
 ### Why Demonstration Mode?
 

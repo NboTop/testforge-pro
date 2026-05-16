@@ -11,6 +11,19 @@ type FunctionItem = {
   reason: string;
 };
 
+type PRPreviewData = {
+  success: boolean;
+  mode: string;
+  message: string;
+  repositoryUrl: string;
+  branchName: string;
+  filePath: string;
+  commitMessage: string;
+  prTitle: string;
+  prBody: string;
+  note: string;
+};
+
 export default function Home() {
   const [repoUrl, setRepoUrl] = useState(
     "https://github.com/your-username/testforge-demo-repo"
@@ -25,7 +38,7 @@ export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCreatingPR, setIsCreatingPR] = useState(false);
-  const [prUrl, setPrUrl] = useState("");
+  const [prPreview, setPrPreview] = useState<PRPreviewData | null>(null);
   const [totalFunctions, setTotalFunctions] = useState(0);
   const [untestedFunctions, setUntestedFunctions] = useState(0);
   const [error, setError] = useState("");
@@ -35,7 +48,7 @@ export default function Home() {
 
   async function analyzeRepo() {
     setIsAnalyzing(true);
-    setPrUrl("");
+    setPrPreview(null);
     setTestCode("");
     setError("");
 
@@ -73,7 +86,7 @@ export default function Home() {
   async function generateTest(item: FunctionItem) {
     setSelectedFunction(item);
     setIsGenerating(true);
-    setPrUrl("");
+    setPrPreview(null);
     setError("");
     setCopySuccess(false);
 
@@ -125,7 +138,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      setPrUrl(data.prUrl);
+      setPrPreview(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       console.error("Error creating PR:", err);
@@ -353,20 +366,65 @@ export default function Home() {
               >
                 {isCreatingPR ? "Creating PR..." : "Create Pull Request"}
               </button>
-
-              {prUrl && (
-                <div className="mt-4 rounded-xl border border-green-400/20 bg-green-500/10 p-4 text-sm text-green-100">
-                  <strong>✓ Demo PR Workflow Complete</strong>
-                  <p className="mt-2 text-xs text-green-100/80">
-                    This simulates the pull request creation process. In production, this would create a branch, commit the generated test file, and open an actual GitHub pull request.
+  
+              {prPreview && (
+                <div className="mt-4 rounded-xl border border-green-400/20 bg-green-500/10 p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <h3 className="text-lg font-medium text-green-100">
+                      ✓ Demo PR Workflow Complete
+                    </h3>
+                    <span className="rounded-full bg-blue-500/20 px-2.5 py-0.5 text-xs font-medium text-blue-200">
+                      Simulated
+                    </span>
+                  </div>
+                  
+                  <p className="text-sm text-green-100/80 mb-4">
+                    {prPreview.message}
                   </p>
-                  <a
-                    href={prUrl}
-                    target="_blank"
-                    className="mt-2 inline-block underline underline-offset-4"
-                  >
-                    View simulated PR URL →
-                  </a>
+  
+                  <div className="space-y-2.5 text-sm">
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-300 font-medium min-w-[100px]">Branch:</span>
+                      <code className="flex-1 rounded bg-black/30 px-2 py-1 text-xs text-green-100 font-mono">
+                        {prPreview.branchName}
+                      </code>
+                    </div>
+                    
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-300 font-medium min-w-[100px]">File Path:</span>
+                      <code className="flex-1 rounded bg-black/30 px-2 py-1 text-xs text-green-100 font-mono">
+                        {prPreview.filePath}
+                      </code>
+                    </div>
+                    
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-300 font-medium min-w-[100px]">Commit:</span>
+                      <code className="flex-1 rounded bg-black/30 px-2 py-1 text-xs text-green-100 font-mono">
+                        {prPreview.commitMessage}
+                      </code>
+                    </div>
+                    
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-300 font-medium min-w-[100px]">PR Title:</span>
+                      <span className="flex-1 text-green-100">
+                        {prPreview.prTitle}
+                      </span>
+                    </div>
+                  </div>
+  
+                  <div className="mt-4 pt-4 border-t border-green-400/20">
+                    <p className="text-xs text-green-100/70 mb-3">
+                      {prPreview.note}
+                    </p>
+                    <a
+                      href={prPreview.repositoryUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-500"
+                    >
+                      View project repository →
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
