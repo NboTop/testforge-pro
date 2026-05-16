@@ -45,9 +45,9 @@ This demonstration validates the complete developer workflow:
 |---|---:|---|
 | `/api/analyze` | POST | **Optional live GitHub scan** for public repositories using unauthenticated API, with automatic fallback to demo data. Detects exported functions using regex patterns. |
 | `/api/generate-test` | POST | Returns pre-written Jest test templates from local mock data |
-| `/api/create-pr` | POST | Returns simulated PR workflow response with mock URL |
+| `/api/create-pr` | POST | **Dual-mode PR creation**: Real GitHub PR for configured demo repository, simulated preview for all other repositories |
 
-**Note:** The `/api/analyze` route now supports optional live scanning of public GitHub repositories without authentication. It falls back to demo data for private repos, rate limits, errors, or when no functions are detected.
+**Note:** The `/api/analyze` route supports optional live scanning of public GitHub repositories without authentication. It falls back to demo data for private repos, rate limits, errors, or when no functions are detected. The `/api/create-pr` route creates real PRs only for the exact configured demo repository (requires `GITHUB_TOKEN`, `GITHUB_DEMO_OWNER`, `GITHUB_DEMO_REPO` environment variables), with automatic fallback to simulated preview for all other repositories.
 
 ---
 
@@ -83,55 +83,96 @@ App displays Jest test code from mock data
         ↓
 User clicks Create Pull Request
         ↓
-POST /api/create-pr (returns simulated success message)
+POST /api/create-pr
         ↓
-App displays mock PR URL (no actual PR created)
+    ┌─────────────────────────────────────┐
+    │ Repository matches configured demo? │
+    │ AND GITHUB_TOKEN exists?            │
+    └─────────────────────────────────────┘
+            ↓ Yes                ↓ No
+    Real GitHub PR        Simulated Preview
+    (authenticated)       (no GitHub write)
+            ↓                    ↓
+    Create branch,        Generate preview
+    commit file,          with branch name,
+    open PR               file path, PR details
+            ↓                    ↓
+    Return PR URL         Return preview data
+            ↓                    ↓
+    ┌─────────────────────────────────────┐
+    │ App displays result with badge      │
+    │ (Live or Simulated)                 │
+    └─────────────────────────────────────┘
 ```
 
 ---
 
-## Current MVP Features
+## Current Implementation Status
 
-### ✅ Optional Public GitHub Repository Scanning
-- **Live scanning** of public GitHub repositories without authentication
-- **Unauthenticated GitHub API** access for repository metadata and file trees
-- **Regex-based function detection** for exported functions
-- **Automatic fallback** to demo mode for private repos, rate limits, or errors
-- **Severity assignment** based on file paths (payment/auth/security = High, etc.)
-- **Limited scope**: First 8 files, up to 10 functions for performance
+### ✅ Currently Implemented Features
 
-### ⚠️ Limitations of Current Implementation
-- **No real coverage verification**: Does not check if tests actually exist
-- **Regex-based only**: No AST parsing for accurate code analysis
-- **Public repos only**: No support for private repositories
-- **No authentication**: Uses unauthenticated GitHub API (rate limited)
+**Live Public GitHub Repository Scanning**
+- Unauthenticated GitHub API access for public repositories
+- Regex-based function detection in JavaScript/TypeScript files
+- Source file prioritization (src/, lib/, app/ directories)
+- Automatic fallback to demo mode when unavailable
+- Severity assignment based on file paths
 
-## What's NOT Yet Implemented
+**Template-Based Jest Test Generation**
+- Pre-written test templates for common patterns
+- Route handler test templates for Next.js API routes
+- React component test starters
+- Regular function test templates with edge cases
+- Copy-to-clipboard functionality
+
+**Dual-Mode PR Creation**
+- Real GitHub PR creation for one configured demo repository
+- Server-side GitHub token handling (never exposed to frontend)
+- Branch creation, file commit, and PR opening via GitHub API
+- Requires exact repository URL match for security
+- Automatic fallback to simulated preview for all other repositories
+
+**IBM Bob-Assisted Development**
+- Complete development partnership documented in `bob_sessions/`
+- Architecture planning, implementation, and code review
+- Session logs showing AI-assisted development process
+
+**watsonx.ai-Ready Architecture**
+- API routes structured for future Granite model integration
+- Environment variable checks prepared for production mode
+- Clear separation between demo and production logic paths
+
+### ❌ Features Not Yet Implemented
 
 The following features are **not currently implemented** and are planned for future production versions:
 
-### ❌ Live watsonx.ai Integration
+**Live watsonx.ai Integration**
 - No connection to IBM watsonx.ai Granite models
 - No real AI inference or model API calls
 - Test generation uses pre-written templates only
 
-### ❌ Authenticated GitHub Integration
-- No GitHub OAuth or token-based authentication
-- No actual pull request creation
-- No private repository access
-- No branch creation or commits
-
-### ❌ AST-Based Code Analysis
+**AST-Based Code Analysis**
 - No Abstract Syntax Tree parsing
 - No Babel or TypeScript compiler integration
 - No real test coverage verification
 - Function detection uses regex patterns only
 
-### ❌ Authentication & Security
+**GitHub OAuth Authentication**
+- No GitHub OAuth or token-based user authentication
+- No private repository access
+- Limited to public repos and one configured demo repo
+- No multi-user support with individual permissions
+
+**Unrestricted PR Creation**
+- Real PRs only for configured demo repository
+- Other repos use simulated preview mode
+- OAuth would enable user-authorized PR creation to arbitrary repositories
+
+**Enterprise Features**
 - No user authentication system
-- No API key management
-- No OAuth flows
-- No credential storage
+- No persistent database or user accounts
+- No API key management for individual users
+- No team collaboration features
 
 ---
 

@@ -84,10 +84,12 @@ For production with real APIs:
 2. Add the following variables:
 
 ```bash
-# GitHub API (for real repository scanning)
+# GitHub API (for controlled PR creation in demo repository)
 GITHUB_TOKEN=ghp_your_token_here
+GITHUB_DEMO_OWNER=your-github-username
+GITHUB_DEMO_REPO=your-demo-repo-name
 
-# IBM watsonx.ai (for real AI test generation)
+# IBM watsonx.ai (for real AI test generation - not yet implemented)
 WATSONX_API_KEY=your_api_key
 WATSONX_PROJECT_ID=your_project_id
 WATSONX_REGION=us-south
@@ -99,6 +101,8 @@ NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 ```
 
 3. Redeploy to apply changes
+
+**Note:** Real PR creation only works for the exact repository specified in `GITHUB_DEMO_OWNER` and `GITHUB_DEMO_REPO`. All other repositories will use simulated preview mode.
 
 ---
 

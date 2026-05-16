@@ -55,6 +55,7 @@ export default function Home() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [scanMode, setScanMode] = useState<"live-github-scan" | "demo-fallback">("demo-fallback");
   const [scanNote, setScanNote] = useState("");
+  const [showDemoGuide, setShowDemoGuide] = useState(true);
 
   async function analyzeRepo() {
     // Trim and validate repoUrl
@@ -296,6 +297,41 @@ export default function Home() {
               <p className="mt-1 text-sm text-slate-400">
                 Enter a public GitHub repository URL to scan with live API, or use demo fallback data.
               </p>
+
+              {showDemoGuide && (
+                <div className="mt-4 rounded-xl border border-amber-400/20 bg-amber-500/5 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-amber-300 text-sm font-medium">📖 Demo Guide</span>
+                      </div>
+                      <ul className="space-y-1.5 text-xs text-slate-300">
+                        <li className="flex items-start gap-2">
+                          <span className="text-amber-400 mt-0.5">•</span>
+                          <span>Use <code className="bg-black/30 px-1.5 py-0.5 rounded text-amber-200 font-mono">https://github.com/void-logic/testforge-demo-target</code> to create a real GitHub PR.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-amber-400 mt-0.5">•</span>
+                          <span>Use any other public GitHub repository to see a simulated PR preview.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-amber-400 mt-0.5">•</span>
+                          <span>Real PR creation is restricted to the configured demo repo for safety.</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <button
+                      onClick={() => setShowDemoGuide(false)}
+                      className="text-slate-400 hover:text-slate-200 transition-colors p-1"
+                      aria-label="Dismiss demo guide"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-5 flex flex-col gap-3">
                 <div className="flex flex-col gap-3 sm:flex-row">

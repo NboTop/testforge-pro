@@ -1,9 +1,9 @@
 # 🧪 TestForge Pro
 
-**AI-Test-Generation Workflow Demo for JavaScript/TypeScript Repositories**
+**Turn idea into impact faster**
 
 [![IBM Bob Hackathon 2026](https://img.shields.io/badge/IBM%20Bob-Hackathon%202026-0f62fe?style=for-the-badge)](https://github.com)
-[![Built with watsonx.ai](https://img.shields.io/badge/Built%20for-watsonx.ai-161616?style=for-the-badge)](https://www.ibm.com/watsonx)
+[![Designed for watsonx.ai](https://img.shields.io/badge/Designed%20for-watsonx.ai-161616?style=for-the-badge)](https://www.ibm.com/watsonx)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
 
