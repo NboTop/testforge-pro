@@ -196,8 +196,15 @@ This PR was automatically created by the TestForge Pro demo workflow, showcasing
     filePath,
     commitMessage,
     prTitle,
-    note: "This is a real GitHub pull request created in the configured demo repository. You can view, review, and merge it on GitHub.",
+    note: "Created only for the configured demo repository using server-side GitHub credentials.",
   };
+}
+
+// Validate if a string is a valid GitHub repository URL
+function isValidGitHubUrl(url: string): boolean {
+  if (!url) return false;
+  const githubUrlPattern = /^https:\/\/github\.com\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+\/?$/;
+  return githubUrlPattern.test(url);
 }
 
 // Generate simulated PR preview response
@@ -208,17 +215,22 @@ function generateSimulatedPRPreview(
 ): SimulatedPRResponse {
   const safeFunctionName = sanitizeFunctionName(functionName);
 
+  // Validate repoUrl and use fallback if invalid
+  const validRepoUrl = isValidGitHubUrl(repoUrl)
+    ? repoUrl
+    : "https://github.com/NboTop/testforge-pro";
+
   return {
     success: true,
     mode: "simulated-pr-preview",
     message: "No real PR was created. This preview shows what would be prepared for GitHub.",
-    repositoryUrl: repoUrl,
+    repositoryUrl: validRepoUrl,
     branchName: `testforge/add-tests-${safeFunctionName}`,
     filePath: `__tests__/${safeFunctionName}.test.ts`,
     commitMessage: `test: add Jest tests for ${functionName}`,
     prTitle: `Add tests for ${functionName}`,
-    prBody: `This simulated pull request would add generated Jest tests for the \`${functionName}\` function.\n\nIn production, this would:\n- Create a new branch from main\n- Commit the test file using authenticated GitHub API access\n- Open a pull request with the changes\n\n**Note:** Real PR creation requires GitHub authentication and write permissions. This preview shows the request details without modifying any repository.`,
-    note: "Real PR creation is only available for the configured demo repository. All other repositories use simulated preview mode.",
+    prBody: `This simulated pull request would add generated Jest tests for the \`${functionName}\` function.\n\nIn production, this would:\n- Create a new branch from main\n- Commit the test file using authenticated GitHub API access\n- Open a pull request with the changes\n\n**Note:** Real PR creation requires GitHub authentication and write permissions.`,
+    note: "No real pull request was created. Real PR creation is restricted to the configured demo repository.",
   };
 }
 
@@ -234,8 +246,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Default to a generic repository URL if not provided
-    const targetRepoUrl = repoUrl || "https://github.com/your-username/your-repo";
+    // Use provided repoUrl or fallback to default
+    const targetRepoUrl = repoUrl || "https://github.com/NboTop/testforge-pro";
 
     // Check if this is the configured demo repository and we have a token
     const token = process.env.GITHUB_TOKEN;

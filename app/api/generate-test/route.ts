@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 
 type GenerateTestResponse = {
+  success: boolean;
   functionName: string;
   provider: "mock-fallback" | "watsonx-ready";
   testCode: string;
   explanation: string;
   filename: string;
+  message: string;
+  note: string;
 };
 
 /**
@@ -419,11 +422,16 @@ describe("${functionName}", () => {
     }
 
     const response: GenerateTestResponse = {
+      success: true,
       functionName,
       provider,
       testCode,
       explanation,
       filename,
+      message: `Test generated successfully for ${functionName}`,
+      note: provider === "watsonx-ready"
+        ? "Architecture is ready for watsonx.ai integration. Currently using template-based generation."
+        : "Using mock fallback templates. Real AI generation planned for watsonx.ai integration.",
     };
 
     return NextResponse.json(response);

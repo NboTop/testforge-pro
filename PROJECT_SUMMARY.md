@@ -6,11 +6,11 @@
 
 ## 🎯 Project Overview
 
-TestForge Pro is an AI-powered test generation platform that demonstrates automated detection of untested functions in JavaScript/TypeScript repositories and generates comprehensive Jest test suites. The system features a working Next.js dashboard with functional demo capabilities, architected for future IBM watsonx.ai integration.
+TestForge Pro is a test generation workflow demonstration platform that showcases automated detection of untested functions in JavaScript/TypeScript repositories and generates Jest test starter templates. The system features live public GitHub repository scanning, controlled real PR creation for one configured demo repository, and automatic fallback to simulated preview for all other repositories.
 
-**Current Status:** ✅ **Demo-Ready Proof of Concept** | **Production Path Defined**
+**Current Status:** ✅ **Functional Demo with Live GitHub Integration** | **Honest About Limitations**
 
-**Implementation State:** Functional MVP operating in demo mode with mock data, validating the complete vision through a working user interface and API architecture ready for production integrations.
+**Implementation State:** Working MVP with live public GitHub scanning using unauthenticated API, regex-based function detection, template-based test generation, real PR creation for configured demo repository only, and simulated PR preview fallback for all other repositories. Architecture prepared for future watsonx.ai integration.
 
 ---
 
@@ -28,15 +28,16 @@ TestForge Pro is an AI-powered test generation platform that demonstrates automa
 
 ### ✅ IBM Technology Integration
 - **Architecture Designed for watsonx.ai**: System architected with IBM watsonx.ai Granite model as the intended AI provider
-- **Integration Planned**: Production phase will connect to watsonx.ai for actual AI-powered test generation
-- **Demo Mode Operational**: Current implementation uses mock data to demonstrate the complete workflow
-- **Clear Implementation Path**: Detailed roadmap for transitioning from demo to production watsonx.ai integration
+- **Integration Ready**: API routes structured for future watsonx.ai connection
+- **Current Implementation**: Uses template-based generation with watsonx.ai-ready architecture
+- **Clear Implementation Path**: Detailed roadmap for transitioning to live watsonx.ai integration
 
-### ✅ Working Demo
-- **Fully Functional UI**: Complete Next.js dashboard with all user interactions operational
-- **Three API Routes Active**: `/api/analyze`, `/api/generate-test`, `/api/create-pr` all functional with demo data
-- **No External Dependencies**: Mock data ensures reliable demonstration without API credentials
-- **Complete User Flow**: Repository input → Function detection display → Test generation preview → PR workflow simulation
+### ✅ Working Demo with Real Features
+- **Live GitHub Scanning**: Actual public repository scanning using unauthenticated GitHub API
+- **Real PR Creation**: Genuine GitHub pull requests for one configured demo repository
+- **Simulated Fallback**: Automatic preview mode for all other repositories
+- **Three API Routes Active**: `/api/analyze`, `/api/generate-test`, `/api/create-pr` all functional
+- **Complete User Flow**: Repository input → Live scan or fallback → Test generation → Real PR or simulated preview
 
 ---
 
@@ -47,6 +48,8 @@ TestForge Pro is an AI-powered test generation platform that demonstrates automa
 - **Language**: TypeScript for type safety
 - **Styling**: Tailwind CSS for modern UI
 - **API Design**: RESTful endpoints with proper error handling
+- **GitHub Integration**: Live public repo scanning + controlled PR creation
+- **Security Model**: Server-side token handling, restricted PR creation
 
 ### Features Implemented
 1. ✅ **Optional Live GitHub Scan**: Scans public repositories using unauthenticated GitHub API with regex-based function detection

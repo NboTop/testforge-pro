@@ -131,6 +131,190 @@ Simulated preview is used when:
 
 ---
 
+## 📋 Current Implementation Status
+
+### ✅ Currently Implemented Features
+
+**Live Public GitHub Scanning**
+- Unauthenticated GitHub API access for public repositories
+- Regex-based function detection in JavaScript/TypeScript files
+- Source file prioritization (src/, lib/, app/ directories)
+- Automatic fallback to demo mode when unavailable
+
+**Jest Starter Test Generation**
+- Template-based test generation for common patterns
+- Route handler test templates for Next.js API routes
+- React component test starters
+- Regular function test templates with edge cases
+- Copy-to-clipboard functionality
+
+**Controlled Real PR Creation**
+- Real GitHub PR creation for one configured demo repository
+- Server-side GitHub token handling (never exposed to frontend)
+- Branch creation, file commit, and PR opening via GitHub API
+- Requires exact repository URL match for security
+
+**Simulated PR Preview for All Other Repos**
+- Automatic fallback when repository doesn't match demo config
+- Shows branch name, file path, commit message, and PR title
+- No actual GitHub writes for non-configured repositories
+- Safe demonstration of PR workflow
+
+**IBM Bob-Assisted Development**
+- Complete development partnership documented in `bob_sessions/`
+- Architecture planning, implementation, and code review
+- Session logs showing AI-assisted development process
+
+**watsonx.ai-Ready Architecture**
+- API routes structured for future Granite model integration
+- Environment variable checks prepared for production mode
+- Clear separation between demo and production logic paths
+
+### ❌ Not Yet Implemented
+
+**Live watsonx.ai Inference**
+- Currently uses template-based generation, not live AI
+- Architecture ready for Granite model integration
+- Requires IBM Cloud credentials and watsonx.ai setup
+
+**AST-Based Coverage Verification**
+- Current implementation uses regex pattern matching
+- Real test file detection not implemented
+- Coverage percentage calculation planned for future
+
+**GitHub OAuth Authentication**
+- No user-based GitHub authentication
+- Cannot access private repositories
+- Limited to public repos and one configured demo repo
+
+**Private Repository Scanning**
+- Only public repositories can be scanned
+- OAuth integration required for private repo access
+
+**Arbitrary Repository PR Creation**
+- Real PRs only for configured demo repository
+- Other repos use simulated preview mode
+- OAuth would enable user-authorized PR creation
+
+**Enterprise Team Features**
+- No multi-user workspaces
+- No team collaboration features
+- No analytics or reporting dashboards
+
+---
+
+## 🔒 Security Model
+
+### Server-Side Token Protection
+
+**GitHub Token Security**
+- Token stored in `.env.local` (never committed to git)
+- Handled exclusively on the server side in API routes
+- Never exposed to frontend JavaScript or API responses
+- Never logged to console, files, or error messages
+- Only used for the exact configured demo repository
+
+**Controlled PR Creation**
+- Real PR creation restricted to `GITHUB_DEMO_OWNER/GITHUB_DEMO_REPO`
+- Exact URL match required: `https://github.com/${OWNER}/${REPO}`
+- All other repositories automatically use simulated preview
+- No arbitrary repository writes possible
+
+**Fallback Safety**
+- Missing environment variables trigger simulation mode
+- GitHub API failures fall back to simulated preview
+- Network errors handled gracefully with fallback
+- No user data or tokens ever exposed in error messages
+
+**Frontend Isolation**
+- Frontend never receives GitHub tokens
+- API responses exclude sensitive credentials
+- Client-side code cannot trigger arbitrary PR creation
+- All GitHub operations server-side only
+
+### Demo Repository Configuration
+
+To enable real PR creation for your demo repository:
+
+1. Create a GitHub Personal Access Token with `repo` scope
+2. Add to `.env.local` (never commit this file):
+   ```bash
+   GITHUB_TOKEN=ghp_your_token_here
+   GITHUB_DEMO_OWNER=void-logic
+   GITHUB_DEMO_REPO=testforge-demo-target
+   ```
+3. Real PRs will only be created when repository URL exactly matches
+4. All other repositories automatically use simulated preview
+
+**Important:** The demo repository should be a test repository you control, not a production codebase.
+
+---
+
+## 🎬 Demo Flow
+
+Follow this workflow to experience all features:
+
+### Step 1: Analyze Configured Demo Repository
+
+1. Enter your configured demo repository URL (if you set up environment variables):
+   ```
+   https://github.com/void-logic/testforge-demo-target
+   ```
+   Or click the **"Use demo repo"** button to automatically populate the field.
+2. Click **"Analyze Repository"**
+3. Observe live GitHub scan fetching real source files
+4. See functions detected with regex-based analysis
+5. Note the **"🟢 Live GitHub Scan"** badge in the header
+
+### Step 2: Generate Test for calculateFinalPrice
+
+1. Find `calculateFinalPrice` in the detected functions list
+2. Click **"Generate Test"** button
+3. Review the comprehensive Jest test suite in the preview
+4. Note the provider badge showing **"📋 Mock Fallback"** or **"🤖 watsonx.ai Ready"**
+5. See the sanitized filename: `calculateFinalPrice.test.ts`
+6. Read the explanation of what was generated
+7. Click **"📋 Copy test to clipboard"** to copy the code
+
+### Step 3: Create Real GitHub PR
+
+1. Click **"Create or Preview PR"** button
+2. If repository matches your configured demo repo:
+   - See **"✅ Real GitHub PR Created"** with **"🟢 Live"** badge
+   - View branch name, file path, commit message, and PR title
+   - Click **"🔗 View pull request →"** to see the actual PR on GitHub
+   - Note: "Created only for the configured demo repository using server-side GitHub credentials."
+3. Verify the PR was created in your GitHub repository
+
+### Step 4: Analyze Another Repository
+
+1. Enter a different public repository URL:
+   ```
+   https://github.com/vercel/next.js
+   ```
+2. Click **"Analyze Repository"**
+3. Observe live scan or demo fallback depending on availability
+4. Generate a test for any detected function
+
+### Step 5: Show Simulated PR Preview Fallback
+
+1. Click **"Create or Preview PR"** button
+2. Since repository doesn't match configured demo repo:
+   - See **"📋 PR Preview Generated"** with **"🔵 Simulated"** badge
+   - View what would be prepared for GitHub
+   - Note: "No real pull request was created. Real PR creation is restricted to the configured demo repository."
+3. Click **"🔗 View repository →"** to see the target repository
+
+### Key Observations
+
+- **Live Scanning**: Works for any public GitHub repository
+- **Real PR Creation**: Only for your configured demo repository
+- **Simulated Preview**: Automatic fallback for all other repositories
+- **Security**: Token never exposed, no arbitrary writes possible
+- **Honest Messaging**: Clear badges and notes explain what's real vs simulated
+
+---
+
 ## 💡 The Problem
 
 Software teams struggle with test coverage gaps that lead to production bugs and technical debt. Writing comprehensive test suites is time-consuming, often taking **45+ minutes per function**, and developers frequently skip testing edge cases and error scenarios. This results in:

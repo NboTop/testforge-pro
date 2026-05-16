@@ -25,9 +25,17 @@ type PRPreviewData = {
   note: string;
 };
 
+type GenerateTestResponse = {
+  functionName: string;
+  provider: "mock-fallback" | "watsonx-ready";
+  testCode: string;
+  explanation: string;
+  filename: string;
+};
+
 export default function Home() {
   const [repoUrl, setRepoUrl] = useState(
-    "https://github.com/your-username/testforge-demo-repo"
+    "https://github.com/void-logic/testforge-demo-target"
   );
   const [functions, setFunctions] = useState<FunctionItem[]>([]);
   const [selectedFunction, setSelectedFunction] = useState<FunctionItem | null>(
@@ -36,6 +44,7 @@ export default function Home() {
   const [testCode, setTestCode] = useState("");
   const [testExplanation, setTestExplanation] = useState("");
   const [testFilename, setTestFilename] = useState("");
+  const [testProvider, setTestProvider] = useState<"mock-fallback" | "watsonx-ready">("mock-fallback");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCreatingPR, setIsCreatingPR] = useState(false);
@@ -48,9 +57,26 @@ export default function Home() {
   const [scanNote, setScanNote] = useState("");
 
   async function analyzeRepo() {
+    // Trim and validate repoUrl
+    const cleanedRepoUrl = repoUrl.trim();
+    
+    // Display error if repoUrl is empty
+    if (!cleanedRepoUrl) {
+      setError("Please enter a repository URL");
+      return;
+    }
+
+    // Temporary debug log
+    console.log("Analyze clicked:", cleanedRepoUrl);
+
+    // Set loading state before fetch
     setIsAnalyzing(true);
+    
+    // Clear old PR and test state
     setPrPreview(null);
     setTestCode("");
+    setTestExplanation("");
+    setTestFilename("");
     setError("");
 
     try {
@@ -59,27 +85,37 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ repoUrl }),
+        body: JSON.stringify({ repoUrl: cleanedRepoUrl }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to analyze repository");
       }
 
+      // Parse response JSON with error handling
       const data = await response.json();
-      setFunctions(data.functions);
-      setTotalFunctions(data.totalFunctions);
-      setUntestedFunctions(data.untestedFunctions);
+      
+      // Safely handle missing data.functions using Array.isArray checks
+      const functionsArray = Array.isArray(data.functions) ? data.functions : [];
+      
+      // Safely set state variables
+      setFunctions(functionsArray);
+      setTotalFunctions(data.totalFunctions || 0);
+      setUntestedFunctions(data.untestedFunctions || 0);
       setScanMode(data.mode || "demo-fallback");
       setScanNote(data.note || "");
       
-      if (data.functions.length > 0) {
-        setSelectedFunction(data.functions[0]);
+      // Set selectedFunction to the first detected function or null
+      if (functionsArray.length > 0) {
+        setSelectedFunction(functionsArray[0]);
+      } else {
+        setSelectedFunction(null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       console.error("Error analyzing repository:", err);
     } finally {
+      // Ensure isAnalyzing is reset in finally block
       setIsAnalyzing(false);
     }
   }
@@ -104,10 +140,11 @@ export default function Home() {
         throw new Error("Failed to generate test");
       }
 
-      const data = await response.json();
+      const data: GenerateTestResponse = await response.json();
       setTestCode(data.testCode);
       setTestExplanation(data.explanation || "");
       setTestFilename(data.filename || `${item.name}.test.ts`);
+      setTestProvider(data.provider || "mock-fallback");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       console.error("Error generating test:", err);
@@ -175,23 +212,54 @@ export default function Home() {
                 TestForge Pro
               </h1>
               <p className="mt-3 max-w-2xl text-sm text-slate-300">
-                A Bob-assisted workflow demo: identify untested functions, generate Jest tests, and simulate a pull request. API-backed demo mode — watsonx.ai and GitHub integration ready.
+                A Bob-assisted workflow demo: identify untested functions, generate Jest tests, and create or preview pull requests. Live GitHub scanning with controlled PR creation.
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-                Built with IBM Bob + watsonx.ai
+            <div className="flex flex-wrap gap-2">
+              <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300">
+                Built with IBM Bob
               </div>
-              <div className={`rounded-2xl border px-4 py-3 text-xs ${
+              <div className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
                 scanMode === "live-github-scan"
                   ? "border-green-400/30 bg-green-500/10 text-green-200"
                   : "border-blue-400/30 bg-blue-500/10 text-blue-200"
               }`}>
                 {scanMode === "live-github-scan"
-                  ? "Live GitHub Scan · Public Repo Data"
-                  : "Demo Mode · Mock Fallback Active"}
+                  ? "🟢 Live GitHub Scan"
+                  : "🔵 Demo Fallback"}
               </div>
+              <div className="rounded-full border border-purple-400/30 bg-purple-500/10 px-3 py-1.5 text-xs font-medium text-purple-200">
+                🤖 watsonx.ai Ready
+              </div>
+              <div className="rounded-full border border-orange-400/30 bg-orange-500/10 px-3 py-1.5 text-xs font-medium text-orange-200">
+                🔍 Regex Detection
+              </div>
+            </div>
+          </div>
+
+          {/* Workflow Steps */}
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/20 text-xs font-bold text-blue-300">1</span>
+                <h3 className="text-sm font-medium text-slate-200">Analyze Repository</h3>
+              </div>
+              <p className="text-xs text-slate-400">Scan public GitHub repos or use demo fallback</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20 text-xs font-bold text-green-300">2</span>
+                <h3 className="text-sm font-medium text-slate-200">Generate Tests</h3>
+              </div>
+              <p className="text-xs text-slate-400">Create Jest tests with AI-ready templates</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-500/20 text-xs font-bold text-purple-300">3</span>
+                <h3 className="text-sm font-medium text-slate-200">Create or Preview PR</h3>
+              </div>
+              <p className="text-xs text-slate-400">Real PR for demo repo, simulated for others</p>
             </div>
           </div>
         </div>
@@ -212,7 +280,7 @@ export default function Home() {
               ? "border-green-400/20 bg-green-500/10 text-green-100"
               : "border-blue-400/20 bg-blue-500/10 text-blue-100"
           }`}>
-            <strong>ℹ️ Scan Info:</strong> {scanNote}
+            <strong>ℹ️ {scanMode === "live-github-scan" ? "Live Scan Result:" : "Demo Fallback:"}</strong> {scanNote}
           </div>
         </section>
       )}
@@ -221,22 +289,35 @@ export default function Home() {
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
             <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl">
-              <h2 className="text-lg font-medium">Analyze repository</h2>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-500/20 text-sm font-bold text-blue-300">1</span>
+                <h2 className="text-lg font-medium">Analyze Repository</h2>
+              </div>
               <p className="mt-1 text-sm text-slate-400">
-                Enter a GitHub repo URL. Demo mode uses a prepared repo with
-                missing tests.
+                Enter a public GitHub repository URL to scan with live API, or use demo fallback data.
               </p>
 
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <input
-                  value={repoUrl}
-                  onChange={(e) => setRepoUrl(e.target.value)}
-                  className="flex-1 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none ring-blue-500/40 placeholder:text-slate-500 focus:ring-2"
-                />
+              <div className="mt-5 flex flex-col gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <input
+                    value={repoUrl}
+                    onChange={(e) => setRepoUrl(e.target.value)}
+                    placeholder="https://github.com/owner/repo"
+                    className="flex-1 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none ring-blue-500/40 placeholder:text-slate-500 focus:ring-2"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setRepoUrl("https://github.com/void-logic/testforge-demo-target")}
+                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/10 whitespace-nowrap"
+                  >
+                    Use demo repo
+                  </button>
+                </div>
                 <button
+                  type="button"
                   onClick={analyzeRepo}
-                  disabled={isAnalyzing}
-                  className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={isAnalyzing || !repoUrl.trim()}
+                  className="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isAnalyzing ? "Analyzing..." : "Analyze Repository"}
                 </button>
@@ -271,11 +352,17 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {functions.map((item, index) => (
+                  {functions.map((item, index) => {
+                    // Use item.id if available, otherwise fall back to name+file for unique identification
+                    const itemKey = item.id || `${item.name}-${item.file}`;
+                    const selectedKey = selectedFunction?.id || (selectedFunction ? `${selectedFunction.name}-${selectedFunction.file}` : null);
+                    const isSelected = itemKey === selectedKey;
+                    
+                    return (
                     <div
                       key={item.id || `${item.name}-${item.file}-${index}`}
                       className={`rounded-xl border p-4 transition ${
-                        selectedFunction?.name === item.name
+                        isSelected
                           ? "border-blue-400/60 bg-blue-500/10"
                           : "border-white/10 bg-black/20"
                       }`}
@@ -308,8 +395,7 @@ export default function Home() {
                           disabled={item.tested || isGenerating}
                           className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
                         >
-                          {isGenerating &&
-                          selectedFunction?.name === item.name
+                          {isGenerating && isSelected
                             ? "Generating..."
                             : item.tested
                             ? "Already tested"
@@ -317,7 +403,8 @@ export default function Home() {
                         </button>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -325,10 +412,28 @@ export default function Home() {
 
           <div className="space-y-6">
             <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-              <h2 className="text-lg font-medium">Generated test preview</h2>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-green-500/20 text-sm font-bold text-green-300">2</span>
+                <h2 className="text-lg font-medium">Generate Test</h2>
+              </div>
               <p className="mt-1 text-sm text-slate-400">
-                Preview AI-generated Jest tests before creating a pull request.
+                Preview generated Jest tests before creating a pull request.
               </p>
+
+              {testCode && (
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-medium text-slate-400">Provider:</span>
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                    testProvider === "watsonx-ready"
+                      ? "bg-purple-500/20 text-purple-200 border border-purple-400/30"
+                      : "bg-blue-500/20 text-blue-200 border border-blue-400/30"
+                  }`}>
+                    {testProvider === "watsonx-ready" ? "🤖 watsonx.ai Ready" : "📋 Mock Fallback"}
+                  </span>
+                  <span className="text-xs font-medium text-slate-400 ml-2">File:</span>
+                  <code className="text-xs text-slate-300 font-mono">{testFilename}</code>
+                </div>
+              )}
 
               <div className="mt-5 rounded-xl border border-white/10 bg-black/40">
                 <div className="border-b border-white/10 px-4 py-3 text-xs text-slate-400">
@@ -339,7 +444,7 @@ export default function Home() {
                 <pre className="min-h-[420px] overflow-auto p-4 text-xs leading-6 text-slate-200">
                   <code>
                     {isGenerating
-                      ? "Generating tests with AI..."
+                      ? "Generating tests..."
                       : testCode || "// Generated test will appear here"}
                   </code>
                 </pre>
@@ -350,39 +455,42 @@ export default function Home() {
                   onClick={copyToClipboard}
                   className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
                 >
-                  {copySuccess ? "✓ Copied to clipboard!" : "Copy test to clipboard"}
+                  {copySuccess ? "✓ Copied to clipboard!" : "📋 Copy test to clipboard"}
                 </button>
               )}
 
               {testExplanation && (
                 <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-                  <p className="text-xs font-medium text-slate-400 mb-2">What was generated:</p>
+                  <p className="text-xs font-medium text-slate-400 mb-2">📝 What was generated:</p>
                   <p className="text-sm text-slate-300 leading-relaxed">{testExplanation}</p>
                 </div>
               )}
 
-              <button
-                onClick={createPR}
-                disabled={!testCode || isCreatingPR}
-                className="mt-4 w-full rounded-xl bg-green-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {isCreatingPR ? "Creating PR..." : "Create Pull Request"}
-              </button>
+              <div className="mt-4 flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-purple-500/20 text-sm font-bold text-purple-300">3</span>
+                <button
+                  onClick={createPR}
+                  disabled={!testCode || isCreatingPR}
+                  className="flex-1 rounded-xl bg-green-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {isCreatingPR ? "Creating PR..." : "Create or Preview PR"}
+                </button>
+              </div>
   
               {prPreview && (
                 <div className="mt-4 rounded-xl border border-green-400/20 bg-green-500/10 p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <h3 className="text-lg font-medium text-green-100">
                       {prPreview.mode === "real-github-pr"
-                        ? "✓ Real GitHub PR Created"
-                        : "✓ PR Preview Generated"}
+                        ? "✅ Real GitHub PR Created"
+                        : "📋 PR Preview Generated"}
                     </h3>
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                       prPreview.mode === "real-github-pr"
-                        ? "bg-green-500/30 text-green-100"
-                        : "bg-blue-500/20 text-blue-200"
+                        ? "bg-green-500/30 text-green-100 border border-green-400/40"
+                        : "bg-blue-500/20 text-blue-200 border border-blue-400/30"
                     }`}>
-                      {prPreview.mode === "real-github-pr" ? "Live" : "Simulated"}
+                      {prPreview.mode === "real-github-pr" ? "🟢 Live" : "🔵 Simulated"}
                     </span>
                   </div>
                   
@@ -422,7 +530,7 @@ export default function Home() {
   
                   <div className="mt-4 pt-4 border-t border-green-400/20">
                     <p className="text-xs text-green-100/70 mb-3">
-                      {prPreview.note}
+                      <strong>ℹ️ Note:</strong> {prPreview.note}
                     </p>
                     {prPreview.mode === "real-github-pr" && prPreview.prUrl ? (
                       <a
@@ -431,18 +539,18 @@ export default function Home() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-500"
                       >
-                        View pull request →
+                        🔗 View pull request →
                       </a>
-                    ) : (
+                    ) : prPreview.repositoryUrl ? (
                       <a
                         href={prPreview.repositoryUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-500"
+                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500"
                       >
-                        View project repository →
+                        🔗 View repository →
                       </a>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               )}

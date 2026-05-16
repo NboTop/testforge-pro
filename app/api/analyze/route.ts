@@ -12,6 +12,7 @@ type FunctionItem = {
 };
 
 type AnalyzeResponse = {
+  success: boolean;
   repo: string;
   totalFunctions: number;
   untestedFunctions: number;
@@ -19,6 +20,7 @@ type AnalyzeResponse = {
   estimatedTimeSaved: string;
   functions: FunctionItem[];
   mode: "live-github-scan" | "demo-fallback";
+  message: string;
   note: string;
 };
 
@@ -356,21 +358,22 @@ export async function POST(request: Request) {
       if (scannedFunctions && scannedFunctions.length > 0) {
         functions = scannedFunctions;
         mode = "live-github-scan";
-        note = "Live public GitHub scan completed using the unauthenticated GitHub API. Source files are prioritized when available. Function detection is regex-based and real coverage verification is planned for the future AST implementation.";
+        note = "Live public GitHub scan completed. Source files were fetched from GitHub and functions were detected with regex-based analysis. Real coverage verification is planned for the AST-based implementation.";
       } else {
         // Fallback to demo data
         functions = DEMO_FUNCTIONS;
-        note = "Live scan was unavailable or no functions were detected, so demo fallback data is shown.";
+        note = "Demo fallback data is being shown because live scanning was unavailable, private, rate-limited, or no functions were detected.";
       }
     } else {
       // Invalid URL, use demo data
       functions = DEMO_FUNCTIONS;
-      note = "Live scan was unavailable or no functions were detected, so demo fallback data is shown.";
+      note = "Demo fallback data is being shown because live scanning was unavailable, private, rate-limited, or no functions were detected.";
     }
 
     const untestedFunctions = functions.filter((fn) => !fn.tested).length;
 
     const response: AnalyzeResponse = {
+      success: true,
       repo: repoUrl,
       totalFunctions: functions.length,
       untestedFunctions,
@@ -378,6 +381,9 @@ export async function POST(request: Request) {
       estimatedTimeSaved: "0 min",
       functions,
       mode,
+      message: mode === "live-github-scan"
+        ? "Repository analyzed successfully using live GitHub scan"
+        : "Repository analyzed using demo fallback data",
       note,
     };
 
