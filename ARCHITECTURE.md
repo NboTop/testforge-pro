@@ -6,14 +6,14 @@
 
 ## Current Implementation
 
-TestForge Pro is a Next.js application that demonstrates an AI-assisted test generation workflow. The MVP features live public GitHub repository scanning, regex-based function detection, template-based Jest test generation, controlled real GitHub PR creation for one configured demo repository, and automatic simulated preview fallback for all other repositories.
+TestForge Pro is a Next.js application featuring live Gemini AI test generation with template fallback. The production system includes live public GitHub repository scanning, regex-based function detection, server-side Gemini AI inference for test generation, controlled real GitHub PR creation for one configured demo repository, and automatic simulated preview fallback for all other repositories.
 
 ### Purpose
 
-This demonstration validates the complete developer workflow:
+This production system delivers the complete developer workflow:
 1. Analyze a repository (live scan for public repos or demo fallback)
 2. Identify untested functions (regex-based detection)
-3. Generate Jest tests (template-based generation)
+3. Generate Jest tests (live Gemini AI with template fallback)
 4. Create pull requests (real PR for configured demo repo, simulated preview for others)
 
 ---
@@ -41,11 +41,12 @@ This demonstration validates the complete developer workflow:
 
 | Route | Method | Current Behavior |
 |---|---:|---|
+| `/api/health` | GET | Returns system health status including Gemini configuration, active model, and test generation mode |
 | `/api/analyze` | POST | **Optional live GitHub scan** for public repositories using unauthenticated API, with automatic fallback to demo data. Detects exported functions using regex patterns. |
-| `/api/generate-test` | POST | Returns pre-written Jest test templates from local mock data |
+| `/api/generate-test` | POST | **Live Gemini AI inference** when `GEMINI_API_KEY` configured, with automatic template fallback when unavailable |
 | `/api/create-pr` | POST | **Dual-mode PR creation**: Real GitHub PR for configured demo repository, simulated preview for all other repositories |
 
-**Note:** The `/api/analyze` route supports optional live scanning of public GitHub repositories without authentication. It falls back to demo data for private repos, rate limits, errors, or when no functions are detected. The `/api/create-pr` route creates real PRs only for the exact configured demo repository (requires `GITHUB_TOKEN`, `GITHUB_DEMO_OWNER`, `GITHUB_DEMO_REPO` environment variables), with automatic fallback to simulated preview for all other repositories.
+**Note:** The `/api/health` route reports Gemini configuration status and active model. The `/api/generate-test` route invokes Gemini API server-side when configured, falling back to templates when Gemini unavailable. The `/api/create-pr` route creates real PRs only for the exact configured demo repository (requires `GITHUB_TOKEN`, `GITHUB_DEMO_OWNER`, `GITHUB_DEMO_REPO` environment variables), with automatic fallback to simulated preview for all other repositories.
 
 ---
 
@@ -75,9 +76,26 @@ POST /api/analyze
         ↓
 User selects a function
         ↓
-POST /api/generate-test (returns pre-written test template)
+POST /api/generate-test
         ↓
-App displays Jest test code from mock data
+    ┌─────────────────────────────────────┐
+    │ GEMINI_API_KEY configured?          │
+    └─────────────────────────────────────┘
+            ↓ Yes                ↓ No
+    Invoke Gemini API     Template Fallback
+    (server-side)         (pre-written tests)
+            ↓                    ↓
+    ┌─────────────────────────────────────┐
+    │ Gemini inference successful?        │
+    └─────────────────────────────────────┘
+            ↓ Yes                ↓ No
+    Return AI tests       Template Fallback
+    (Gemini Live badge)   (Template badge)
+            ↓                    ↓
+    ┌─────────────────────────────────────┐
+    │ App displays Jest test code         │
+    │ with provider badge                 │
+    └─────────────────────────────────────┘
         ↓
 User clicks Create Pull Request
         ↓
@@ -109,6 +127,13 @@ POST /api/create-pr
 
 ### ✅ Currently Implemented Features
 
+**Live Gemini AI Test Generation**
+- Server-side Gemini API integration when `GEMINI_API_KEY` configured
+- Real AI inference using configurable model (default: `gemini-3-flash-preview`)
+- "Gemini Live" provider badge when AI successfully generates tests
+- Automatic template fallback when Gemini unavailable or fails
+- API keys handled exclusively server-side, never exposed to client
+
 **Live Public GitHub Repository Scanning**
 - Unauthenticated GitHub API access for public repositories
 - Regex-based function detection in JavaScript/TypeScript files
@@ -116,12 +141,12 @@ POST /api/create-pr
 - Automatic fallback to demo mode when unavailable
 - Severity assignment based on file paths
 
-**Template-Based Jest Test Generation**
-- Pre-written test templates for common patterns
-- Route handler test templates for Next.js API routes
-- React component test starters
-- Regular function test templates with edge cases
-- Copy-to-clipboard functionality
+**Health Monitoring Endpoint**
+- `/api/health` reports system configuration status
+- Returns `geminiConfigured` boolean indicating Gemini API key presence
+- Returns `geminiModel` string showing active AI model
+- Returns `testGeneration` mode: "gemini-live-with-template-fallback" or "template-only"
+- Enables verification of live AI integration status
 
 **Dual-Mode PR Creation**
 - Real GitHub PR creation for one configured demo repository
@@ -136,18 +161,19 @@ POST /api/create-pr
 - Session logs showing AI-assisted development process
 
 **watsonx.ai-Ready Architecture**
-- API routes structured for future Granite model integration
-- Environment variable checks prepared for production mode
-- Clear separation between demo and production logic paths
+- Provider interface supports multiple AI backends
+- Environment variable structure prepared for watsonx.ai
+- Clear separation between AI providers
+- Easy provider switching via configuration
 
 ### ❌ Features Not Yet Implemented
 
 The following features are **not currently implemented** and are planned for future production versions:
 
 **Live watsonx.ai Integration**
-- No connection to IBM watsonx.ai Granite models
-- No real AI inference or model API calls
-- Test generation uses pre-written templates only
+- Architecture ready for Granite model integration
+- Provider interface supports easy backend switching
+- Requires IBM Cloud credentials and watsonx.ai setup
 
 **AST-Based Code Analysis**
 - No Abstract Syntax Tree parsing
@@ -237,60 +263,80 @@ All Bob collaboration is documented in `bob_sessions/`:
 
 ## Environment Configuration
 
-### Current Demo Mode (No Configuration Required)
+### Current Production Configuration
 
-The application runs completely without environment variables. All features work out-of-the-box using mock data.
-
-### Future Production Configuration
-
-When integrations are implemented, the following environment variables will be required:
+The application works without environment variables using fallback systems. Optional configuration enables live features:
 
 ```bash
+# Gemini AI (for live test generation)
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-3-flash-preview
+
 # GitHub API (for repository scanning and PR creation)
 GITHUB_TOKEN=ghp_your_token_here
+GITHUB_DEMO_OWNER=void-logic
+GITHUB_DEMO_REPO=testforge-demo-target
 
-# IBM watsonx.ai (for AI-powered test generation)
+# IBM watsonx.ai (future integration)
 WATSONX_API_KEY=your_api_key
 WATSONX_PROJECT_ID=your_project_id
 WATSONX_REGION=us-south
 WATSONX_MODEL_ID=ibm/granite-13b-instruct-v2
 
-# Application Mode
-NEXT_PUBLIC_DEMO_MODE=false
-NEXT_PUBLIC_APP_URL=https://your-production-url.com
+# Application Configuration
+NEXT_PUBLIC_APP_URL=https://testforge-void.vercel.app
 ```
+
+**Configuration Notes:**
+- Application remains functional without any environment variables
+- `GEMINI_API_KEY` enables live AI inference (falls back to templates when absent)
+- `GITHUB_TOKEN` enables real PR creation for demo repository only
+- All API keys handled server-side, never exposed to client
 
 ---
 
 ## Deployment
 
-### Current Demo Deployment
+### Current Production Deployment
 
-The demo version can be deployed to any Next.js-compatible platform:
-- **Vercel** (recommended for demos)
+The production version is deployed on Vercel with live Gemini AI integration:
+- **Live URL**: https://testforge-void.vercel.app/
+- **Health Endpoint**: https://testforge-void.vercel.app/api/health
+- **Gemini AI**: Configured and operational
+- **GitHub Integration**: Live scanning and controlled PR creation
+
+Deployment platforms supported:
+- **Vercel** (current production deployment)
 - **Docker** containers
 - **Cloud platforms** (AWS, Google Cloud, Azure)
 
-No environment variables or external service credentials are required for demo deployment.
+Production deployment includes:
+- Gemini API key configuration for live AI
+- GitHub token for controlled PR creation
+- Environment variable security
+- Health monitoring endpoint
+- Automatic fallback systems
 
-### Future Production Deployment
+### Future Enhanced Deployment
 
-Production deployment will require:
+Enhanced production deployment will add:
 - IBM Cloud account with watsonx.ai access
 - GitHub OAuth application setup
-- Environment variable configuration
-- Security hardening and rate limiting
-- Monitoring and error tracking setup
+- Multi-provider AI configuration
+- Advanced rate limiting
+- Enhanced monitoring and analytics
 
 ---
 
 ## Summary
 
-**Current State:** Fully functional demonstration application using mock data exclusively
+**Current State:** Production application with live Gemini AI integration and template fallback
 
-**Future Vision:** Production-ready platform with live IBM watsonx.ai and GitHub integrations
+**Live Features:** Gemini AI test generation, GitHub repository scanning, controlled PR creation
 
-**Development Approach:** Demo-first to validate UX, with clear path to production implementation
+**Future Vision:** Multi-provider AI platform with watsonx.ai integration and enhanced features
+
+**Development Approach:** Production-first with reliability through fallback systems
 
 **IBM Bob Role:** Development partner for architecture, coding, and documentation (not a runtime API)
 

@@ -16,11 +16,11 @@ The application is deployed on Vercel and fully operational. The health endpoint
 
 ## 🎯 Project Overview
 
-TestForge Pro is a test generation workflow demonstration platform that showcases automated detection of untested functions in JavaScript/TypeScript repositories and generates Jest test starter templates. The system features live public GitHub repository scanning, controlled real PR creation for one configured demo repository, and automatic fallback to simulated preview for all other repositories.
+TestForge Pro is a production test generation platform featuring live Gemini AI integration with template fallback. The system provides automated detection of untested functions in JavaScript/TypeScript repositories and generates comprehensive Jest test suites using real AI inference. Features include live public GitHub repository scanning, server-side Gemini API integration, controlled real PR creation for one configured demo repository, and automatic fallback systems for reliability.
 
-**Current Status:** ✅ **Functional Demo with Live GitHub Integration** | **Deployed on Vercel** | **Honest About Limitations**
+**Current Status:** ✅ **Production with Live Gemini AI** | **Deployed on Vercel** | **Template Fallback for Reliability**
 
-**Implementation State:** Working MVP with live public GitHub scanning using unauthenticated API, regex-based function detection, template-based test generation, real PR creation for configured demo repository only, and simulated PR preview fallback for all other repositories. Architecture prepared for future watsonx.ai integration.
+**Implementation State:** Production system with live Gemini AI test generation (server-side API integration), automatic template fallback when Gemini unavailable, live public GitHub scanning using unauthenticated API, regex-based function detection, real PR creation for configured demo repository only, and simulated PR preview fallback for all other repositories. Architecture prepared for watsonx.ai integration via provider switching.
 
 ---
 
@@ -42,12 +42,14 @@ TestForge Pro is a test generation workflow demonstration platform that showcase
 - **Current Implementation**: Uses template-based generation; watsonx.ai integration not yet live
 - **Clear Implementation Path**: Detailed roadmap for transitioning to live watsonx.ai integration
 
-### ✅ Working Demo with Real Features
+### ✅ Working Production with Live AI
+- **Live Gemini AI Integration**: Real AI inference for test generation when configured
+- **Template Fallback System**: Automatic fallback ensuring reliability
 - **Live GitHub Scanning**: Actual public repository scanning using unauthenticated GitHub API
 - **Real PR Creation**: Genuine GitHub pull requests for one configured demo repository
 - **Simulated Fallback**: Automatic preview mode for all other repositories
-- **Three API Routes Active**: `/api/analyze`, `/api/generate-test`, `/api/create-pr` all functional
-- **Complete User Flow**: Repository input → Live scan or fallback → Test generation → Real PR or simulated preview
+- **Four API Routes Active**: `/api/health`, `/api/analyze`, `/api/generate-test`, `/api/create-pr` all functional
+- **Complete User Flow**: Repository input → Live scan or fallback → AI test generation or template fallback → Real PR or simulated preview
 
 ---
 
@@ -62,17 +64,20 @@ TestForge Pro is a test generation workflow demonstration platform that showcase
 - **Security Model**: Server-side token handling, restricted PR creation
 
 ### Features Implemented
-1. ✅ **Optional Live GitHub Scan**: Scans public repositories using unauthenticated GitHub API with regex-based function detection
-2. ✅ **Repository Analysis UI**: Functional input and workflow display with live scan or demo fallback
-3. ✅ **Function Detection Display**: Shows detected functions from live scan or predefined demo data
-4. ✅ **Test Generation Preview**: Generates realistic Jest test code through mock AI provider
-5. ✅ **Test Code Formatting**: Syntax-highlighted preview of generated tests
-6. ✅ **Controlled GitHub PR Creation**: Real PR creation for one preconfigured demo repository with automatic fallback to simulated preview
-7. ✅ **Loading States**: Real-time feedback during operations
-8. ✅ **Error Handling**: Comprehensive user-friendly error messages
-9. ✅ **Responsive Design**: Mobile and desktop optimized interface
-10. ✅ **Scan Mode Indicator**: Visual badge showing live scan vs demo fallback status
-11. ✅ **PR Mode Indicator**: Visual badge showing real PR vs simulated preview status
+1. ✅ **Live Gemini AI Test Generation**: Server-side Gemini API integration with real AI inference
+2. ✅ **Template Fallback System**: Automatic fallback when Gemini unavailable or fails
+3. ✅ **Health Monitoring Endpoint**: Reports Gemini configuration and system status
+4. ✅ **Optional Live GitHub Scan**: Scans public repositories using unauthenticated GitHub API with regex-based function detection
+5. ✅ **Repository Analysis UI**: Functional input and workflow display with live scan or demo fallback
+6. ✅ **Function Detection Display**: Shows detected functions from live scan or predefined demo data
+7. ✅ **AI-Powered Test Preview**: Generates comprehensive Jest tests via Gemini or templates
+8. ✅ **Test Code Formatting**: Syntax-highlighted preview of generated tests
+9. ✅ **Controlled GitHub PR Creation**: Real PR creation for one preconfigured demo repository with automatic fallback to simulated preview
+10. ✅ **Loading States**: Real-time feedback during operations
+11. ✅ **Error Handling**: Comprehensive user-friendly error messages
+12. ✅ **Responsive Design**: Mobile and desktop optimized interface
+13. ✅ **Provider Badge System**: Visual indicators showing "Gemini Live" or "Template Fallback"
+14. ✅ **PR Mode Indicator**: Visual badge showing real PR vs simulated preview status
 
 ### Code Quality
 - **Type Safety**: Full TypeScript coverage
@@ -181,17 +186,27 @@ testforge-pro/
 
 ## 📈 Current Implementation State
 
-### Demo Mode Architecture
-The current MVP operates entirely with mock data to provide a reliable, dependency-free demonstration of the complete user workflow. This approach ensures consistent presentation quality while the production integrations are being developed.
+### Production Architecture with Fallback Systems
+The current production system features live Gemini AI integration with automatic template fallback to ensure reliability. This approach provides real AI-powered test generation while maintaining system availability when external services are unavailable.
 
 ### Implementation Reality
 **What's Working Now:**
 - ✅ **Next.js Dashboard**: Fully functional UI with all user interactions
-- ✅ **Three API Routes**: `/api/analyze`, `/api/generate-test`, `/api/create-pr` operational
+- ✅ **Four API Routes**: `/api/health`, `/api/analyze`, `/api/generate-test`, `/api/create-pr` operational
+- ✅ **Live Gemini AI Integration**: Server-side Gemini API calls for real AI test generation
+- ✅ **Template Fallback System**: Automatic fallback when Gemini unavailable or fails
 - ✅ **Optional Live GitHub Scan**: Public repository scanning with unauthenticated GitHub API
 - ✅ **Regex-Based Function Detection**: Detects exported functions in live scans
 - ✅ **Automatic Fallback System**: Demo data for private repos, rate limits, or errors
-- ✅ **Complete User Flow**: End-to-end workflow demonstration
+- ✅ **Complete User Flow**: End-to-end workflow with live AI and fallback systems
+
+**Live Gemini AI Implementation:**
+1. **Server-Side Integration**: Gemini API invoked server-side when `GEMINI_API_KEY` configured
+2. **Configurable Model**: Uses `gemini-3-flash-preview` by default (configurable via `GEMINI_MODEL`)
+3. **Real AI Inference**: Actual API calls to Gemini for intelligent test generation
+4. **Provider Badge**: "Gemini Live" badge displays when AI successfully generates tests
+5. **Template Fallback**: Automatic fallback to pre-written templates when Gemini unavailable
+6. **Security**: API keys handled exclusively server-side, never exposed to client
 
 **Live GitHub Scan Implementation:**
 1. **Public Repository Scanning**: Uses GitHub's unauthenticated API to fetch repo metadata and file trees
@@ -200,28 +215,30 @@ The current MVP operates entirely with mock data to provide a reliable, dependen
 4. **Limitations**: No real coverage verification, public repos only, regex-based detection
 5. **Fallback**: Automatically uses demo data when live scan unavailable or unsuccessful
 
-**What Still Uses Mock/Demo Data:**
-1. **AI Test Generation**: Template-based generation using pre-written Jest tests (watsonx.ai integration planned)
-2. **PR Creation for Non-Demo Repos**: Simulated preview for repositories other than the configured demo repository (GitHub OAuth planned for arbitrary repo access)
-3. **Coverage Verification**: Does not verify if tests actually exist (AST-based analysis planned)
+**What Still Uses Fallback/Simulation:**
+1. **PR Creation for Non-Demo Repos**: Simulated preview for repositories other than the configured demo repository (GitHub OAuth planned for arbitrary repo access)
+2. **Coverage Verification**: Does not verify if tests actually exist (AST-based analysis planned)
+3. **Template Fallback**: Used when Gemini API unavailable or fails (ensures reliability)
 
 ### Why This Approach?
-- **Hackathon Reliability**: Zero external dependencies ensure consistent demos
-- **Proof of Concept**: Validates the complete vision through working UI
-- **Clear Path Forward**: Architecture designed for straightforward production integration
-- **Technical Credibility**: Demonstrates understanding of full implementation requirements
+- **Production Reliability**: Live AI with automatic fallback ensures system always works
+- **Real AI Integration**: Demonstrates actual Gemini API integration, not mockups
+- **Security First**: Server-side API key handling with no client exposure
+- **Clear Path Forward**: Architecture designed for easy provider switching (watsonx.ai ready)
+- **Technical Credibility**: Production deployment with real integrations and proper error handling
 
-### Mock Data Provided
-1. **3 Sample Functions**:
-   - `calculateFinalPrice` (High severity, untested)
-   - `applyDiscountCode` (Medium severity, untested)
-   - `validateUserEmail` (Low severity, tested)
+### Fallback Data Provided
+1. **Demo Repository Data** (when live scan unavailable):
+   - 3 sample functions with realistic metadata
+   - Severity assignments based on function context
+   - Simulated coverage status
 
-2. **Generated Tests**:
+2. **Template-Based Tests** (when Gemini unavailable):
    - Comprehensive Jest test suites
    - Edge case coverage
    - Error handling tests
    - Realistic code structure
+   - Used automatically when Gemini API fails or is not configured
 
 3. **Dual-Mode PR Workflow**:
    - Real GitHub PR creation for configured demo repository
@@ -517,15 +534,15 @@ TestForge Pro represents a **solid proof of concept** that validates the vision 
 5. **Clear Production Roadmap**: Detailed plan for transitioning from demo to production
 
 ### Current Reality
-- **Demo Mode**: All functionality operates with mock data for reliable presentation
-- **Architecture Validated**: Working UI proves the design and user experience
-- **Production-Ready Structure**: Clean separation allows straightforward API integration
-- **Technical Credibility**: Honest representation of current state vs. future capabilities
+- **Production Mode**: Live Gemini AI integration with template fallback for reliability
+- **Architecture Validated**: Working production deployment with real integrations
+- **Provider-Ready Structure**: Clean separation allows easy provider switching (watsonx.ai ready)
+- **Technical Credibility**: Honest representation of live features and planned enhancements
 
 ### Value Proposition
-This project demonstrates **understanding of the complete solution** while being transparent about implementation progress. The working demo validates the vision, the architecture is sound, and the path to production is clearly defined with realistic timelines.
+This project demonstrates **production-ready AI integration** with proper fallback systems and security. The live Gemini AI integration proves the architecture works with real AI providers, making watsonx.ai integration straightforward. The system maintains reliability through automatic fallback systems.
 
-**Current Status:** Demo-Ready Proof of Concept | Production Path Defined
+**Current Status:** Production Deployment with Live AI | watsonx.ai Integration Ready
 
 **Hackathon Readiness:** ✅ Ready for Presentation and Evaluation
 

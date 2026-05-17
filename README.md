@@ -25,27 +25,32 @@ The application is deployed on Vercel and fully functional. You can:
 
 ---
 
-## 🎯 Current Status: Demonstration Mode
+## 🎯 Current Status: Live AI Test Generation
 
-> **⚠️ IMPORTANT: This MVP operates entirely in demonstration mode using simulated responses and mock data.**
+> **✅ PRODUCTION: TestForge Pro features live Gemini AI test generation with template fallback.**
 
-**No External Services Required:**
-- ✅ No IBM Cloud account needed
-- ✅ No watsonx.ai API credentials required
-- ✅ No GitHub tokens or authentication needed
-- ✅ No external API calls made
-- ✅ Works completely offline after installation
-- ✅ Zero configuration required to run
+**Live AI Test Generation:**
+- ✅ **Gemini AI Integration**: Server-side Gemini API invocation when `GEMINI_API_KEY` is configured
+- ✅ **Configurable Model**: Uses `gemini-3-flash-preview` by default (configurable via `GEMINI_MODEL`)
+- ✅ **Live Inference**: Real AI-powered test generation with "Gemini Live" provider badge
+- ✅ **Template Fallback**: Automatic fallback to template-based generation when Gemini unavailable
+- ✅ **No Client Exposure**: API keys handled exclusively server-side, never exposed to frontend
 
-**What This Means:**
-- All AI functionality uses pre-written mock responses
-- Repository analysis returns simulated data
-- Test generation uses pre-configured templates
-- Pull request workflow is demonstrated, not executed
-- **You can evaluate all features without any credentials**
+**GitHub Integration:**
+- ✅ **Public Repository Scanning**: Live GitHub API access for public repositories
+- ✅ **Real PR Creation**: Genuine pull requests for configured demo repository (https://github.com/void-logic/testforge-demo-target)
+- ✅ **Simulated Preview**: Automatic fallback for all other repositories
+- ✅ **Server-Side Security**: GitHub token never exposed to client
 
-**Future Integration:**
-While the current version uses only simulated responses, the codebase includes a prepared API route architecture designed to facilitate future connection to IBM watsonx.ai Granite models when that integration is implemented.
+**Optional Configuration:**
+- Application works without `GEMINI_API_KEY` using template fallback
+- Application works without `GITHUB_TOKEN` using simulated PR preview
+- Live features activate automatically when environment variables are configured
+
+**watsonx.ai Status:**
+- Architecture is watsonx.ai-ready for future integration
+- Live watsonx.ai inference is not currently configured
+- System designed for easy provider switching
 
 ---
 
@@ -151,21 +156,21 @@ Simulated preview is used when:
 
 ### ✅ Currently Implemented Features
 
+**Live Gemini AI Test Generation**
+- Server-side Gemini API integration when `GEMINI_API_KEY` is configured
+- Real AI inference using `gemini-3-flash-preview` model (configurable via `GEMINI_MODEL`)
+- "Gemini Live" provider badge displays when live inference succeeds
+- Automatic template fallback when Gemini unavailable or fails
+- API keys handled exclusively server-side, never exposed to client
+
 **Live Public GitHub Scanning**
 - Unauthenticated GitHub API access for public repositories
 - Regex-based function detection in JavaScript/TypeScript files
 - Source file prioritization (src/, lib/, app/ directories)
 - Automatic fallback to demo mode when unavailable
 
-**Jest Starter Test Generation**
-- Template-based test generation for common patterns
-- Route handler test templates for Next.js API routes
-- React component test starters
-- Regular function test templates with edge cases
-- Copy-to-clipboard functionality
-
 **Controlled Real PR Creation**
-- Real GitHub PR creation for one configured demo repository
+- Real GitHub PR creation for configured demo repository: https://github.com/void-logic/testforge-demo-target
 - Server-side GitHub token handling (never exposed to frontend)
 - Branch creation, file commit, and PR opening via GitHub API
 - Requires exact repository URL match for security
@@ -189,9 +194,9 @@ Simulated preview is used when:
 ### ❌ Not Yet Implemented
 
 **Live watsonx.ai Inference**
-- Currently uses template-based generation, not live AI
 - Architecture ready for Granite model integration
 - Requires IBM Cloud credentials and watsonx.ai setup
+- System designed for easy provider switching
 
 **AST-Based Coverage Verification**
 - Current implementation uses regex pattern matching
@@ -287,7 +292,9 @@ Follow this workflow to experience all features:
 1. Find `calculateFinalPrice` in the detected functions list
 2. Click **"Generate Test"** button
 3. Review the comprehensive Jest test suite in the preview
-4. Note the provider badge showing **"📋 Mock Fallback"** or **"🤖 watsonx.ai Ready"**
+4. Note the provider badge:
+   - **"🤖 Gemini Live"** when Gemini API successfully generates tests
+   - **"📋 Template Fallback"** when using template-based generation
 5. See the sanitized filename: `calculateFinalPrice.test.ts`
 6. Read the explanation of what was generated
 7. Click **"📋 Copy test to clipboard"** to copy the code
@@ -431,20 +438,20 @@ All Bob interactions are preserved in `bob_sessions/`:
   - Used as a development tool, not as a runtime API
   - All development sessions documented in `bob_sessions/`
 
-### Current Application Status: Demonstration Mode Only
+### Current Application Status: Live AI with Optional Configuration
 
-**⚠️ Important: No Live watsonx.ai Integration**
+**✅ Live Gemini AI Integration**
 
-This MVP version **does not** connect to IBM watsonx.ai services or any external APIs. The application operates entirely in demonstration mode using:
-- **Simulated responses** for all AI-related functionality
-- **Mock data** for repository analysis and test generation
-- **Pre-configured test scenarios** that run locally without external calls
+This production version features **live Gemini AI test generation** with automatic fallback:
+- **Live AI inference** when `GEMINI_API_KEY` environment variable is configured
+- **Server-side API calls** to Gemini using configured model (default: `gemini-3-flash-preview`)
+- **Template fallback** when Gemini unavailable, ensuring application remains functional
+- **No client exposure** of API keys or credentials
 
-**No credentials required:** You can run, test, and evaluate all application features without:
-- IBM Cloud accounts
-- watsonx.ai API keys
-- GitHub tokens
-- Any external service authentication
+**Optional credentials for enhanced features:**
+- `GEMINI_API_KEY`: Enables live AI test generation (optional, falls back to templates)
+- `GITHUB_TOKEN`: Enables real PR creation for demo repository (optional, falls back to simulated preview)
+- Application remains fully functional without any credentials using fallback systems
 
 ### Future Integration Architecture
 
@@ -618,24 +625,28 @@ Creates a real GitHub pull request for the configured demo repository, or return
 
 ## 🔐 Environment Variables
 
-### ⚠️ No Credentials Required for Current Version
+### 🔐 Environment Variables
 
-**The application runs completely without any environment variables or credentials.** All features work out-of-the-box in demonstration mode.
+**Optional Configuration for Enhanced Features:**
 
-### Optional Configuration File
-
-If you want to prepare for future integrations, you can create a `.env.local` file, but **this is entirely optional** for the current MVP:
+Create a `.env.local` file to enable live AI generation and real PR creation:
 
 ```bash
 # ============================================
-# GitHub API Configuration (Optional - Demo PR Creation)
+# Gemini AI Configuration (Optional - Live Test Generation)
 # ============================================
-# GITHUB_TOKEN=your_github_personal_access_token
-# GITHUB_DEMO_OWNER=your-github-username
-# GITHUB_DEMO_REPO=your-demo-repo-name
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-3-flash-preview
 
 # ============================================
-# IBM watsonx.ai Configuration (NOT USED - Future)
+# GitHub API Configuration (Optional - Real PR Creation)
+# ============================================
+GITHUB_TOKEN=your_github_personal_access_token
+GITHUB_DEMO_OWNER=void-logic
+GITHUB_DEMO_REPO=testforge-demo-target
+
+# ============================================
+# IBM watsonx.ai Configuration (Future Integration)
 # ============================================
 # WATSONX_API_KEY=
 # WATSONX_PROJECT_ID=
@@ -645,18 +656,20 @@ If you want to prepare for future integrations, you can create a `.env.local` fi
 # ============================================
 # Application Configuration
 # ============================================
-NEXT_PUBLIC_DEMO_MODE=true
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-**Important Notes:**
-- ✅ **No IBM Cloud account needed** - Application runs entirely locally
-- ✅ **No watsonx.ai credentials needed** - All AI functionality is simulated
-- ✅ **No GitHub token needed** - Repository analysis uses mock data
-- ✅ **No external API calls** - Everything runs in demonstration mode
-- ✅ **Works offline** - No internet connection required after installation
+**Configuration Notes:**
+- ✅ **Application works without any environment variables** - Uses template fallback and simulated PR preview
+- ✅ **GEMINI_API_KEY enables live AI** - Real Gemini inference for test generation
+- ✅ **GITHUB_TOKEN enables real PRs** - Only for configured demo repository
+- ✅ **Server-side only** - API keys never exposed to client
+- ✅ **Automatic fallback** - Template generation when Gemini unavailable
 
-The environment variables shown above are **placeholders for future integration** and are not currently used by the application.
+**Security:**
+- All API keys handled exclusively server-side
+- Never logged or exposed in responses
+- GitHub token only works for exact configured repository
 
 ---
 
@@ -699,60 +712,60 @@ Navigate to [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🎭 Current Implementation: Demonstration Mode
+## 🎭 Current Implementation: Live AI with Template Fallback
 
-### How the Application Works (MVP Version)
+### How the Application Works (Production Version)
 
-**⚠️ This version uses simulated responses and mock data exclusively.**
+**✅ This version features live Gemini AI integration with automatic template fallback.**
 
-TestForge Pro currently operates in **demonstration mode only**, using a sophisticated mock system that simulates all AI and external API functionality. There is **no active connection** to IBM watsonx.ai, GitHub APIs, or any external services.
+TestForge Pro operates with **live AI test generation** when configured, using Google's Gemini API for intelligent test creation. The system automatically falls back to template-based generation when Gemini is unavailable, ensuring reliability.
 
-### What's Simulated (Not Real API Calls)
+### Live Features (Real API Calls)
 
-**All functionality uses pre-configured mock data:**
+**Production functionality with real integrations:**
 
 1. **Repository Analysis** (`/api/analyze`)
-   - Simulates scanning a GitHub repository
-   - Returns pre-defined list of 3 sample functions
-   - No actual GitHub API calls or repository access
+   - Live GitHub API calls for public repositories
+   - Regex-based function detection in source files
+   - Automatic fallback to demo data when unavailable
 
 2. **Test Generation** (`/api/generate-test`)
-   - Returns pre-written Jest test templates
-   - No watsonx.ai API calls or AI model inference
-   - Uses locally stored mock test code
+   - **Live Gemini AI inference** when `GEMINI_API_KEY` is configured
+   - Server-side API calls to Gemini using configured model
+   - Automatic template fallback when Gemini unavailable or fails
+   - Provider badge indicates "Gemini Live" or "Template Fallback"
 
-3. **Pull Request Preview** (`/api/create-pr`)
-   - Prepares realistic PR workflow preview with structured details
-   - No actual GitHub commits or PR creation
-   - Returns branch name, file path, commit message, and PR details
-   - Clarifies that real PR creation requires GitHub authentication
+3. **Pull Request Creation** (`/api/create-pr`)
+   - Real GitHub PR creation for configured demo repository
+   - Automatic simulated preview for all other repositories
+   - Server-side GitHub token handling with strict security
 
-### Why Demonstration Mode?
+### Why This Architecture?
 
-- ✅ **Zero Setup Required** - Works immediately without any credentials
-- ✅ **No External Dependencies** - Runs completely offline after installation
-- ✅ **Consistent Results** - Deterministic outputs for reliable presentations
-- ✅ **No Rate Limits** - Unlimited demo runs without API quotas
-- ✅ **Fast Response Times** - Instant feedback without network latency
-- ✅ **No Costs** - No API usage fees or service charges
+- ✅ **Live AI When Available** - Real Gemini inference for intelligent test generation
+- ✅ **Reliable Fallback** - Template system ensures application always works
+- ✅ **Optional Configuration** - Works without credentials using fallback systems
+- ✅ **Server-Side Security** - API keys never exposed to client
+- ✅ **Production Ready** - Real integrations with proper error handling
+- ✅ **Transparent Operation** - Clear badges indicate live vs fallback mode
 
-### Future Production Architecture
+### watsonx.ai Integration Path
 
-While the current version uses only simulated responses, the codebase is **architected for future integration**:
+The codebase is **architected for watsonx.ai integration**:
 
 **Integration-Ready Design:**
-- API routes structured to accept real watsonx.ai calls
-- Environment variable checks prepared for production mode
-- Clear separation between demo logic and integration points
+- Provider interface supports multiple AI backends
+- Environment variable structure prepared for watsonx.ai
+- Clear separation between AI providers
 - Documented transition path in `ARCHITECTURE.md`
 
 **When watsonx.ai integration is implemented:**
-- Replace mock responses with actual Granite model API calls
-- Add authentication and credential management
-- Implement real GitHub repository scanning
-- Enable actual PR creation via GitHub API
+- Add watsonx.ai as additional provider option
+- Implement Granite model API calls
+- Support provider switching via configuration
+- Maintain fallback system for reliability
 
-**Current Status:** Fully functional demonstration showcasing the complete user experience without requiring any external services or credentials.
+**Current Status:** Production deployment with live Gemini AI, template fallback, and architecture ready for watsonx.ai integration.
 
 ---
 
@@ -816,25 +829,26 @@ Development was completed during the hackathon window, with time focused on MVP 
 
 **Current Implementation:**
 - ✅ Next.js TypeScript dashboard with Tailwind CSS
-- ✅ Three functional API routes (live GitHub scan, template generation, controlled PR creation)
+- ✅ Three functional API routes with live integrations
+- ✅ **Live Gemini AI test generation** when `GEMINI_API_KEY` configured
+- ✅ **Template fallback system** when Gemini unavailable
 - ✅ Live public GitHub repository scanning via unauthenticated API
-- ✅ Controlled real PR creation for configured demo repository
+- ✅ **Real GitHub PR creation** for configured demo repository
 - ✅ Automatic simulated fallback for all other repositories
 - ✅ Responsive design for mobile and desktop
 - ✅ Real-time loading states and user feedback
 - ✅ IBM Bob session documentation
-- ✅ **Works in fallback mode without credentials**
-- ✅ **Live GitHub features require GitHub API access and optional server-side credentials**
+- ✅ **Server-side API key handling** with strict security
+- ✅ **Production deployment** at https://testforge-void.vercel.app/
 
-**Future Integration (Not Currently Implemented):**
-- 🔮 Live watsonx.ai API integration (architecture prepared, not connected)
-- 🔮 Real GitHub repository scanning (API structure ready, uses mock data)
-- 🔮 Actual PR creation via GitHub API (workflow designed, currently simulated)
+**Future Integration (Planned):**
+- 🔮 Live watsonx.ai API integration (architecture prepared, provider interface ready)
 - 🔮 AST/Babel parser for code analysis (roadmap defined, not implemented)
-- 🔮 Production authentication system (security planned, not required for demo)
+- 🔮 GitHub OAuth for arbitrary repository PR creation (security planned)
+- 🔮 Private repository scanning support (OAuth required)
 
 **Important Clarification:**
-This MVP demonstrates the complete user experience and workflow using simulated responses. No external APIs are called, and no credentials are needed to run, test, or evaluate the application.
+This production version features live Gemini AI integration with automatic template fallback. The application works without credentials using fallback systems, and activates live features when environment variables are configured.
 
 ---
 

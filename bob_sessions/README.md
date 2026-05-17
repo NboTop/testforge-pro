@@ -59,5 +59,6 @@ Each session export or manually saved session note follows this structure:
 | 3 | [02-api-routes-and-test-generation.md](./02-api-routes-and-test-generation.md) | Code | API route implementation and dashboard integration |
 | 4 | [03-final-review-and-polish.md](./03-final-review-and-polish.md) | Code | Final review, deployment readiness, and submission prep |
 | 5 | [05-controlled-real-pr-creation.md](./05-controlled-real-pr-creation.md) | Code | Controlled PR creation, UI polish, and final documentation |
+| 6 | [06-gemini-integration.md](./06-gemini-integration.md) | Code | Gemini AI integration, enriched PR body generation, workflow evidence UI components |
 
 IBM Bob was used as a **development partner**, not as a runtime API. The application calls no Bob endpoints at runtime.
