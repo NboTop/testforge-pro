@@ -25,6 +25,40 @@ The application is deployed on Vercel and fully functional. You can:
 
 ---
 
+## 🏆 IBM Bob Hackathon Alignment
+
+### Hackathon Theme: "Turn idea into impact faster"
+
+TestForge Pro directly addresses the hackathon theme by **reducing repetitive testing workflow friction**. Manual test writing typically consumes 45+ minutes per function, creating a significant bottleneck in software development. By automating comprehensive test generation, TestForge Pro accelerates the path from code implementation to production-ready quality assurance, enabling developers to turn their ideas into impact faster.
+
+### IBM Bob as Core Development Partner
+
+IBM Bob served as the **core development partner** throughout the entire project lifecycle:
+
+- **Architecture Design**: System design, technology stack decisions, and API route structure planning
+- **Implementation**: API endpoint development, UI integration, mock data generation, and TypeScript implementation
+- **Documentation Creation**: Architecture documentation, implementation guides, deployment instructions, and session documentation
+- **Code Review**: Quality improvements, error handling implementation, and optimization suggestions
+
+**Session Documentation**: Complete development collaboration is documented in the `bob_sessions/` directory, providing transparent evidence of AI-assisted development throughout the project.
+
+### AI Integration Architecture
+
+**Current Deployment:**
+- **Gemini AI**: Serves as the **optional runtime provider** for live test generation capabilities when `GEMINI_API_KEY` is configured
+- **Template Fallback**: Automatic fallback system ensures reliability when AI services are unavailable
+- **Server-Side Security**: All API keys handled exclusively server-side with no client exposure
+
+**watsonx.ai Integration Status:**
+- **Architecturally Prepared**: The system is designed with a provider-agnostic architecture that supports multiple AI backends
+- **Not Active in Current Deployment**: watsonx.ai integration is **architecture-ready but not currently configured** in the production system
+- **Clear Integration Path**: Environment variable structure, API route layer, and prompt engineering framework are prepared for watsonx.ai Granite model integration
+- **Future Production Target**: IBM watsonx.ai Granite models (`ibm/granite-13b-instruct-v2`) are the intended production AI provider
+
+**Accurate Representation**: This project demonstrates production-ready AI integration patterns with Gemini as the current optional provider, while maintaining an architecture that facilitates straightforward watsonx.ai integration when production credentials are configured. The system does not overstate watsonx.ai usage—it is architecturally prepared but not actively deployed.
+
+---
+
 ## 🎯 Current Status: Live AI Test Generation
 
 > **✅ PRODUCTION: TestForge Pro features live Gemini AI test generation with template fallback.**
