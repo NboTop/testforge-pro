@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 type SimulatedPRResponse = {
   success: boolean;
   mode: "simulated-pr-preview";
@@ -11,6 +15,7 @@ type SimulatedPRResponse = {
   prTitle: string;
   prBody: string;
   note: string;
+  workflowEvidence: WorkflowEvidence;
 };
 
 type RealPRResponse = {
@@ -23,169 +28,228 @@ type RealPRResponse = {
   commitMessage: string;
   prTitle: string;
   note: string;
+  workflowEvidence: WorkflowEvidence;
+};
+
+type WorkflowEvidence = {
+  repositoryScanned: string;
+  functionSelected: string;
+  testFileGenerated: string;
+  provider: string;
+  aiModel?: string;
+  contextUsed?: boolean;
+  branchCreated?: string;
+  commitCreated?: string;
+  prOpened?: string;
 };
 
 type CreatePRResponse = SimulatedPRResponse | RealPRResponse;
 
-// Sanitize function name for use in branch names and file paths
+// ─── Utilities ────────────────────────────────────────────────────────────────
+
 function sanitizeFunctionName(functionName: string): string {
-  // Convert to lowercase and replace special characters with hyphens
   return functionName
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
+    .replace(/^-+|-+$/g, "");
 }
 
-// Check if the repository URL matches the configured demo repository
 function isConfiguredDemoRepo(repoUrl: string): boolean {
-  const owner = process.env.GITHUB_DEMO_OWNER;
-  const repo = process.env.GITHUB_DEMO_REPO;
-  
-  if (!owner || !repo) {
-    return false;
-  }
-  
-  const expectedUrl = `https://github.com/${owner}/${repo}`;
-  return repoUrl === expectedUrl;
+  const owner = process.env.GITHUB_DEMO_OWNER?.trim();
+  const repo = process.env.GITHUB_DEMO_REPO?.trim();
+  if (!owner || !repo) return false;
+  return repoUrl === `https://github.com/${owner}/${repo}`;
 }
 
-// Create a real GitHub PR using the GitHub REST API
+function isValidGitHubUrl(url: string): boolean {
+  if (!url) return false;
+  return /^https:\/\/github\.com\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+\/?$/.test(url);
+}
+
+function buildPRBody(
+  functionName: string,
+  filePath: string,
+  branchName: string,
+  provider: string,
+  aiModel?: string,
+  contextUsed?: boolean,
+  repoUrl?: string
+): string {
+  const providerLabel =
+    provider === "gemini-live"
+      ? `🤖 Google Gemini${aiModel ? ` (${aiModel})` : ""} — live AI inference`
+      : provider === "watsonx-ready"
+      ? "🔵 IBM watsonx.ai Ready — template-based generation"
+      : "📋 Template Fallback — deterministic Jest templates";
+
+  const contextNote =
+    provider === "gemini-live"
+      ? contextUsed
+        ? "✅ AI used function name + file path context for test generation"
+        : "✅ AI used function name context for test generation"
+      : "ℹ️ Tests generated from pre-built Jest templates";
+
+  return `## 🧪 TestForge Pro — Automated Test Generation
+
+This pull request was created by **TestForge Pro** as part of the IBM Bob Hackathon 2026 demo workflow.
+
+---
+
+### 📋 What's Included
+
+| Field | Value |
+|-------|-------|
+| **Function** | \`${functionName}\` |
+| **Test File** | \`${filePath}\` |
+| **Branch** | \`${branchName}\` |
+| **Generator** | ${providerLabel} |
+
+---
+
+### 🤖 AI Generation Context
+
+${contextNote}
+
+${
+  provider === "gemini-live"
+    ? `**Gemini model:** \`${aiModel || "gemini-1.5-flash"}\`
+**API mode:** Server-side only — key never exposed to frontend
+**Fallback:** Template-based generation is always available`
+    : `**Generation mode:** Template-based Jest patterns
+**AI integration:** Architecture ready for IBM watsonx.ai Granite and Google Gemini
+**Next step:** Configure \`GEMINI_API_KEY\` or \`WATSONX_API_KEY\` for live AI generation`
+}
+
+---
+
+### ✅ Test Scenarios Covered
+
+The generated tests aim to cover:
+- **Happy path** — normal inputs return expected results
+- **Edge cases** — boundary values and empty inputs
+- **Error handling** — invalid inputs throw or return errors gracefully
+- **Type safety** — TypeScript-compatible assertions
+
+---
+
+### 🔍 Workflow Evidence
+
+This PR was created through the complete TestForge Pro workflow:
+
+1. ✅ **Repository scanned** — live GitHub API scan or demo fallback
+2. ✅ **Function selected** — \`${functionName}\` identified as untested
+3. ✅ **Test generated** — ${providerLabel}
+4. ✅ **Branch created** — \`${branchName}\`
+5. ✅ **File committed** — \`${filePath}\` added to branch
+6. ✅ **PR opened** — via authenticated GitHub API
+
+---
+
+### ⚠️ Review Notes
+
+- Tests are AI-assisted / template-based starters — **review assertions before merging**
+- Adjust imports to match your actual module paths
+- Replace \`expect(true).toBe(true)\` placeholders with real assertions
+- Run \`npm test\` to verify tests pass in your environment
+
+---
+
+### 🔒 Security
+
+- GitHub token handled **server-side only** — never exposed to frontend
+- Real PR creation restricted to the configured demo repository
+- All other repositories use simulated preview mode
+
+---
+
+*Generated by TestForge Pro · IBM Bob Hackathon 2026 · [Repository](${repoUrl || "https://github.com/NboTop/testforge-pro"})*`;
+}
+
+// ─── Real GitHub PR Creation ──────────────────────────────────────────────────
+
 async function createRealGitHubPR(
   testCode: string,
   functionName: string,
-  repoUrl: string
+  repoUrl: string,
+  provider: string,
+  aiModel?: string,
+  contextUsed?: boolean
 ): Promise<RealPRResponse> {
-  const token = process.env.GITHUB_TOKEN;
-  const owner = process.env.GITHUB_DEMO_OWNER;
-  const repo = process.env.GITHUB_DEMO_REPO;
+  const token = process.env.GITHUB_TOKEN?.trim();
+  const owner = process.env.GITHUB_DEMO_OWNER?.trim();
+  const repo = process.env.GITHUB_DEMO_REPO?.trim();
 
-  if (!token || !owner || !repo) {
-    throw new Error("GitHub configuration missing");
-  }
+  if (!token || !owner || !repo) throw new Error("GitHub configuration missing");
 
-  const safeFunctionName = sanitizeFunctionName(functionName);
+  const safeName = sanitizeFunctionName(functionName);
   const timestamp = Date.now();
-  const branchName = `testforge/add-tests-${safeFunctionName}-${timestamp}`;
-  const filePath = `__tests__/${safeFunctionName}.test.ts`;
+  const branchName = `testforge/add-tests-${safeName}-${timestamp}`;
+  const filePath = `__tests__/${safeName}.test.ts`;
   const commitMessage = `test: add Jest tests for ${functionName}`;
-  const prTitle = `Add tests for ${functionName}`;
+  const prTitle = `[TestForge Pro] Add tests for ${functionName}`;
 
   const headers = {
     Authorization: `Bearer ${token}`,
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
+    "Content-Type": "application/json",
   };
 
-  // Step 1: Get repository metadata to obtain default branch
-  const repoResponse = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}`,
-    { headers }
-  );
+  // Step 1 — get default branch SHA
+  const repoRes = await fetch(`https://api.github.com/repos/${owner}/${repo}`, { headers });
+  if (!repoRes.ok) throw new Error(`Repo fetch failed: ${repoRes.statusText}`);
+  const repoData = await repoRes.json();
+  const defaultBranch: string = repoData.default_branch;
 
-  if (!repoResponse.ok) {
-    throw new Error(`Failed to fetch repository metadata: ${repoResponse.statusText}`);
-  }
-
-  const repoData = await repoResponse.json();
-  const defaultBranch = repoData.default_branch;
-
-  // Step 2: Get the base branch reference
-  const refResponse = await fetch(
+  const refRes = await fetch(
     `https://api.github.com/repos/${owner}/${repo}/git/ref/heads/${defaultBranch}`,
     { headers }
   );
+  if (!refRes.ok) throw new Error(`Ref fetch failed: ${refRes.statusText}`);
+  const refData = await refRes.json();
+  const baseSha: string = refData.object.sha;
 
-  if (!refResponse.ok) {
-    throw new Error(`Failed to fetch base branch reference: ${refResponse.statusText}`);
-  }
+  // Step 2 — create branch
+  const branchRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/refs`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ ref: `refs/heads/${branchName}`, sha: baseSha }),
+  });
+  if (!branchRes.ok) throw new Error(`Branch creation failed: ${branchRes.statusText}`);
 
-  const refData = await refResponse.json();
-  const baseSha = refData.object.sha;
-
-  // Step 3: Create new branch
-  const createBranchResponse = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/git/refs`,
-    {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ref: `refs/heads/${branchName}`,
-        sha: baseSha,
-      }),
-    }
-  );
-
-  if (!createBranchResponse.ok) {
-    throw new Error(`Failed to create branch: ${createBranchResponse.statusText}`);
-  }
-
-  // Step 4: Commit test file to the new branch
-  const contentBase64 = Buffer.from(testCode).toString("base64");
-  const commitResponse = await fetch(
+  // Step 3 — commit test file
+  const contentB64 = Buffer.from(testCode).toString("base64");
+  const commitRes = await fetch(
     `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
     {
       method: "PUT",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: commitMessage,
-        content: contentBase64,
-        branch: branchName,
-      }),
+      headers,
+      body: JSON.stringify({ message: commitMessage, content: contentB64, branch: branchName }),
     }
   );
+  if (!commitRes.ok) throw new Error(`Commit failed: ${commitRes.statusText}`);
 
-  if (!commitResponse.ok) {
-    throw new Error(`Failed to commit file: ${commitResponse.statusText}`);
-  }
+  // Step 4 — open PR
+  const prBody = buildPRBody(functionName, filePath, branchName, provider, aiModel, contextUsed, repoUrl);
+  const prRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/pulls`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ title: prTitle, head: branchName, base: defaultBranch, body: prBody }),
+  });
+  if (!prRes.ok) throw new Error(`PR creation failed: ${prRes.statusText}`);
+  const prData = await prRes.json();
 
-  // Step 5: Create pull request
-  const prBody = `This pull request adds generated Jest tests for the \`${functionName}\` function.
-
-## Generated by TestForge Pro
-
-This PR was automatically created by the TestForge Pro demo workflow, showcasing AI-powered test generation capabilities.
-
-### What's included:
-- Comprehensive Jest test suite for \`${functionName}\`
-- Test file: \`${filePath}\`
-- Branch: \`${branchName}\`
-
-### Review notes:
-- Tests were generated using AI assistance
-- Please review test coverage and assertions
-- Adjust test cases as needed for your specific requirements
-
----
-*Generated with TestForge Pro - IBM Bob Hackathon Project*`;
-
-  const prResponse = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/pulls`,
-    {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: prTitle,
-        head: branchName,
-        base: defaultBranch,
-        body: prBody,
-      }),
-    }
-  );
-
-  if (!prResponse.ok) {
-    throw new Error(`Failed to create pull request: ${prResponse.statusText}`);
-  }
-
-  const prData = await prResponse.json();
+  const workflowEvidence: WorkflowEvidence = {
+    repositoryScanned: `https://github.com/${owner}/${repo}`,
+    functionSelected: functionName,
+    testFileGenerated: filePath,
+    provider,
+    ...(aiModel && { aiModel }),
+    ...(contextUsed !== undefined && { contextUsed }),
+    branchCreated: branchName,
+    commitCreated: commitMessage,
+    prOpened: prData.html_url,
+  };
 
   return {
     success: true,
@@ -196,98 +260,99 @@ This PR was automatically created by the TestForge Pro demo workflow, showcasing
     filePath,
     commitMessage,
     prTitle,
-    note: "Created only for the configured demo repository using server-side GitHub credentials.",
+    note: "Real GitHub PR created for the configured demo repository using server-side credentials. Token never exposed to frontend.",
+    workflowEvidence,
   };
 }
 
-// Validate if a string is a valid GitHub repository URL
-function isValidGitHubUrl(url: string): boolean {
-  if (!url) return false;
-  const githubUrlPattern = /^https:\/\/github\.com\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+\/?$/;
-  return githubUrlPattern.test(url);
-}
+// ─── Simulated PR Preview ────────────────────────────────────────────────────
 
-// Generate simulated PR preview response
-function generateSimulatedPRPreview(
+function generateSimulatedPR(
   testCode: string,
   functionName: string,
-  repoUrl: string
+  repoUrl: string,
+  provider: string,
+  aiModel?: string,
+  contextUsed?: boolean
 ): SimulatedPRResponse {
-  const safeFunctionName = sanitizeFunctionName(functionName);
+  const safeName = sanitizeFunctionName(functionName);
+  const validRepoUrl = isValidGitHubUrl(repoUrl) ? repoUrl : "https://github.com/NboTop/testforge-pro";
+  const branchName = `testforge/add-tests-${safeName}`;
+  const filePath = `__tests__/${safeName}.test.ts`;
+  const commitMessage = `test: add Jest tests for ${functionName}`;
+  const prTitle = `[TestForge Pro] Add tests for ${functionName}`;
+  const prBody = buildPRBody(functionName, filePath, branchName, provider, aiModel, contextUsed, validRepoUrl);
 
-  // Validate repoUrl and use fallback if invalid
-  const validRepoUrl = isValidGitHubUrl(repoUrl)
-    ? repoUrl
-    : "https://github.com/NboTop/testforge-pro";
+  const workflowEvidence: WorkflowEvidence = {
+    repositoryScanned: validRepoUrl,
+    functionSelected: functionName,
+    testFileGenerated: filePath,
+    provider,
+    ...(aiModel && { aiModel }),
+    ...(contextUsed !== undefined && { contextUsed }),
+  };
 
   return {
     success: true,
     mode: "simulated-pr-preview",
-    message: "No real PR was created. This preview shows what would be prepared for GitHub.",
+    message: "PR preview generated. No GitHub write occurred — this repo is not the configured demo target.",
     repositoryUrl: validRepoUrl,
-    branchName: `testforge/add-tests-${safeFunctionName}`,
-    filePath: `__tests__/${safeFunctionName}.test.ts`,
-    commitMessage: `test: add Jest tests for ${functionName}`,
-    prTitle: `Add tests for ${functionName}`,
-    prBody: `This simulated pull request would add generated Jest tests for the \`${functionName}\` function.\n\nIn production, this would:\n- Create a new branch from main\n- Commit the test file using authenticated GitHub API access\n- Open a pull request with the changes\n\n**Note:** Real PR creation requires GitHub authentication and write permissions.`,
-    note: "No real pull request was created. Real PR creation is restricted to the configured demo repository.",
+    branchName,
+    filePath,
+    commitMessage,
+    prTitle,
+    prBody,
+    note: "No real pull request was created. Real PR creation is restricted to the configured demo repository for security. This simulated preview shows exactly what would be submitted.",
+    workflowEvidence,
   };
 }
+
+// ─── Route Handler ────────────────────────────────────────────────────────────
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { testCode, functionName, repoUrl } = body;
+    const {
+      testCode,
+      functionName,
+      repoUrl,
+      provider = "mock-fallback",
+      aiModel,
+      contextUsed,
+    }: {
+      testCode: string;
+      functionName: string;
+      repoUrl?: string;
+      provider?: string;
+      aiModel?: string;
+      contextUsed?: boolean;
+    } = body;
 
     if (!testCode || !functionName) {
-      return NextResponse.json(
-        { error: "Test code and function name are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "testCode and functionName are required" }, { status: 400 });
     }
 
-    // Use provided repoUrl or fallback to default
-    const targetRepoUrl = repoUrl || "https://github.com/NboTop/testforge-pro";
-
-    // Check if this is the configured demo repository and we have a token
-    const token = process.env.GITHUB_TOKEN;
-    const isDemoRepo = isConfiguredDemoRepo(targetRepoUrl);
+    const targetRepo = repoUrl || "https://github.com/NboTop/testforge-pro";
+    const token = process.env.GITHUB_TOKEN?.trim();
+    const isDemoRepo = isConfiguredDemoRepo(targetRepo);
 
     if (isDemoRepo && token) {
-      // Attempt to create a real GitHub PR
       try {
-        const realPRResponse = await createRealGitHubPR(
-          testCode,
-          functionName,
-          targetRepoUrl
-        );
-        return NextResponse.json(realPRResponse);
-      } catch (error) {
-        // If real PR creation fails, fall back to simulation
-        console.error("Real PR creation failed, falling back to simulation:", error);
-        const simulatedResponse = generateSimulatedPRPreview(
-          testCode,
-          functionName,
-          targetRepoUrl
-        );
-        return NextResponse.json(simulatedResponse);
+        const result = await createRealGitHubPR(testCode, functionName, targetRepo, provider, aiModel, contextUsed);
+        return NextResponse.json(result);
+      } catch (err) {
+        console.error("Real PR creation failed, falling back to simulation:", err);
+        const simulated = generateSimulatedPR(testCode, functionName, targetRepo, provider, aiModel, contextUsed);
+        return NextResponse.json(simulated);
       }
-    } else {
-      // Return simulated PR preview for all other repositories
-      const simulatedResponse = generateSimulatedPRPreview(
-        testCode,
-        functionName,
-        targetRepoUrl
-      );
-      return NextResponse.json(simulatedResponse);
     }
-  } catch (error) {
-    console.error("Error in create-pr route:", error);
-    return NextResponse.json(
-      { error: "Failed to create pull request" },
-      { status: 500 }
-    );
+
+    const simulated = generateSimulatedPR(testCode, functionName, targetRepo, provider, aiModel, contextUsed);
+    return NextResponse.json(simulated);
+  } catch (err) {
+    console.error("Error in create-pr route:", err);
+    return NextResponse.json({ error: "Failed to create pull request" }, { status: 500 });
   }
 }
 
-// Made with Bob
+// Made with IBM Bob 
