@@ -147,10 +147,17 @@ This PR was created through the complete TestForge Pro workflow:
 
 ### ⚠️ Review Notes
 
-- Tests are AI-assisted / template-based starters — **review assertions before merging**
-- Adjust imports to match your actual module paths
+${
+  provider === "gemini-live"
+    ? `- Tests are **AI-assisted with real assertions** — review for accuracy before merging
+- Verify import paths match your actual module structure
+- Run \`npm test\` to ensure tests execute successfully
+- Validate edge case coverage and add additional scenarios as needed`
+    : `- Tests are **template-based with placeholder assertions** — customize before merging
 - Replace \`expect(true).toBe(true)\` placeholders with real assertions
-- Run \`npm test\` to verify tests pass in your environment
+- Adjust imports to match your actual module paths
+- Run \`npm test\` to verify tests pass in your environment`
+}
 
 ---
 
